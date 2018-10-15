@@ -1,0 +1,20 @@
+<div class="row">
+  <div class="col-xs-12">
+    <app-topic-edit></app-topic-edit>
+    <hr>
+  </div>
+</div>
+<div class="row">
+  <div class="col-xs-5">
+    <app-search [searchType]=searchType></app-search>
+    <hr>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-5">
+    <app-topic-list></app-topic-list>
+  </div>
+  <div class="col-md-7">
+   <router-outlet></router-outlet>
+  </div>
+</div>

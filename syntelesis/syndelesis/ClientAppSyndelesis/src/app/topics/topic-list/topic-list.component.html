@@ -1,0 +1,38 @@
+
+<!-- 
+<div class="row">
+  <div class="col-xs-12 fixed-size">
+      <app-topic-item 
+        *ngFor="let topicEl of pagedTopics"
+        [topic]="topicEl"></app-topic-item>
+  </div>
+</div>
+<div class="row" *ngIf="topicsLength > pageLength">
+  <div class="col-xs-12">
+    <button class="btn btn-primary btn-space" type="button" (click)="setPage(false)">Previous Page</button>
+    <button class="btn btn-primary btn-space" type="button" (click)="setPage(true)">Next Page</button>
+  </div>
+</div> -->
+
+<div class="row">
+    <div class="col-xs-12">
+      <ul class="list-group">
+        <a 
+          class="list-group-item clearfix"
+          style="cursor: pointer"
+          *ngFor="let topic of pagedTopics; let i=index;"
+          (click)="onSelectTopic(topic)">
+          <div class="pull-left" >
+            <h4 class="list-group-item-heading">{{ topic.name }}</h4>
+            <p class="list-group-item-text">{{ topic.description }}</p>
+        </div>
+        </a>
+      </ul>
+    </div>
+  </div>
+  <div class="row" *ngIf="topicsLength > pageLength">
+    <div class="col-xs-12">
+      <button class="btn btn-primary btn-space" type="button" (click)="setPage(false)">Previous Page</button>
+      <button class="btn btn-primary btn-space" type="button" (click)="setPage(true)">Next Page</button>
+    </div>
+  </div>

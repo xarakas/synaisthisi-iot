@@ -1,0 +1,65 @@
+<div class="row">
+  <!-- <div class="col-xs-12 fixed-size">
+      <app-iot-service-item 
+        *ngFor="let serviceEl of pagedServices"
+        [iot_service]="serviceEl"></app-iot-service-item>
+  </div> -->
+  <div class="col-xs-12">
+    <table class="table table-striped table-hover table-bordered">
+      <thead class="thead-dark">
+        <tr>
+          <th *ngFor="let col of columnHeaders">
+            {{ col }}
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let serviceEl of pagedServices">
+          <!-- <th scope="row">1</th> -->
+          <!-- <td>{{ serviceEl.id }}</td> -->
+          <td width="10%">{{ serviceEl.name }}</td>
+          <td width="40%">{{ serviceEl.description }}</td>
+          <td width="10%">
+            <label class="btn btn-default btn-file">
+              <div *ngIf="!serviceEl.service_file_is_uploaded; else noFileUploaded">
+                Upload service file ...
+              </div>
+              <ng-template #noFileUploaded>
+                Update service file ...
+              </ng-template>
+              <input id="serviceFile" type="file" (change)="onFileChanged($event, serviceEl.id)" class="form-control">
+            </label>
+          </td>
+          <td width="20%">
+            <input [disabled]="serviceEl.service_is_running" type="text" id="runparameters" class="form-control" #runparameters>
+          </td>
+          <td width="10%" style="cursor: pointer;" (dblclick)="onItemSelected(serviceEl)" title="Double click to get latest service logs">
+            <div *ngIf="serviceEl.service_is_running; else textServiceNotRunning">Running</div>
+            <ng-template #textServiceNotRunning>Not running</ng-template>
+          </td>
+          <!-- <td width="10%">
+            <div *ngIf="!serviceEl.service_is_running; else serviceNotRunning">
+              <input type=button value="Start Service" class="btn btn-primary" style="width:100%" (click)="onToggleService(serviceEl.id, !serviceEl.service_is_running , runparameters.value)">
+            </div>
+            <ng-template #serviceNotRunning>
+              <input type=button value="Stop Service" class="btn btn-danger" style="width:100%" (click)="onToggleService(serviceEl.id, !serviceEl.service_is_running)">
+            </ng-template>
+          </td> -->
+          <td width="10%">
+            <label class="switch">
+              <input type="checkbox" [checked]="serviceEl.service_is_running" [disabled]="!serviceEl.service_file_is_uploaded" (change)="onToggleService(serviceEl.id, !serviceEl.service_is_running , runparameters.value)">
+              <span class="slider round"></span>
+            </label>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+  </div>
+</div>
+<div class="row" *ngIf="servicesLength > servicesLength">
+  <div class="col-xs-12">
+    <button class="btn btn-primary btn-space" type="button" (click)="setPage(false)">Previous Page</button>
+    <button class="btn btn-primary btn-space" type="button" (click)="setPage(true)">Next Page</button>
+  </div>
+</div>

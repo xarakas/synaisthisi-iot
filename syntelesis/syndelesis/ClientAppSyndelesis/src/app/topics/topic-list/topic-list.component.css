@@ -1,0 +1,8 @@
+.btn-space {
+    margin-top: 15px;
+}
+
+.fixed-size {
+    min-height: 500px;
+    height: 100%;
+}

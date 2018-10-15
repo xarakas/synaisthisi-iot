@@ -1,0 +1,10 @@
+
+  <div id="search-component">
+    <input
+      type="search" results 
+      id="search-box"
+      [placeholder] = placeholderText
+      class="form-control" 
+      (keyup)="search(searchBox.value)"
+      #searchBox
+    >

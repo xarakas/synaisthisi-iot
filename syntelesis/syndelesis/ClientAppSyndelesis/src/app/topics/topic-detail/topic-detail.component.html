@@ -1,0 +1,36 @@
+<span *ngIf="detailedTopic">
+  <h2>Mqtt-Broker channel (topic) "{{ detailedTopic.name }}" details</h2>
+  <div class="row">
+    <div class="col-xs-12">
+      <h3>{{ detailedTopic.description }}</h3>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-xs-12">
+      <label [style.color] = "detailedTopic.can_sub ? 'green' : 'red'">{{ SubPermissionsText }}</label>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-xs-12">
+      <label [style.color] = "detailedTopic.can_pub ? 'green' : 'red'">{{ PubPermissionsText }}</label>
+    </div>
+  </div>
+
+  <span *ngIf="!detailedTopic.can_sub">
+    <button class="btn btn-success" [disabled]="!r_btnState()" (click)="requestTopic()">Request!</button>
+    
+      <form class="form-inline">
+      <div class="checkbox-inline">
+        <label id="agree-label">
+          <input 
+            type="checkbox" 
+            [checked]="termsAccepted" (change)="termsAccepted = !termsAccepted"
+            />I accept the terms of use
+        </label>
+      </div>
+      </form>
+    
+  </span>
+</span>
+
+  

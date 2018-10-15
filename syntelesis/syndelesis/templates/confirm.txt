@@ -1,0 +1,13 @@
+Dear {{ user.username }},
+
+Welcome to Synaisthisis Application!
+
+To confirm your account please click on the following link:
+
+{{ url_for('userconfirmregistartion', token=token, _external=True) }}
+
+Sincerely,
+
+The Synaisthisis Team
+
+Note: replies to this email address are not monitored.

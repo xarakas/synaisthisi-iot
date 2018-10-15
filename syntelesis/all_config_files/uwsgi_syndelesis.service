@@ -1,0 +1,13 @@
+[Unit]
+Description=uWSGI Syndelesis
+
+[Service]
+Environment=DATABASE_URL=postgres://vpitsilis:qwerty@localhost:5432/syndelesis
+ExecStart=/var/www/html/syndelesis-rest/venv/bin/uwsgi --master --emperor /var/www/html/syndelesis-rest/uwsgi.ini --die-on-term --uid vpitsilis --gid vpitsilis --logto /var/www/html/syndelesis-rest/log/emperor.log
+Restart=always
+KillSignal=SIGQUIT
+Type=notify
+NotifyAccess=all
+
+[Install]
+WantedBy=multi-user.target

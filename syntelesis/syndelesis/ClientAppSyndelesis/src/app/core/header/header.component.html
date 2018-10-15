@@ -1,0 +1,37 @@
+<nav class="navbar navbar-default">  <!--navbar-fixed-top-->
+    <div class="container" class="container-fluid">
+        <div class="navbar-header">
+           <a  routerLink="/" class="navbar-brand"><img class="img-portfolio img-responsive" src="/assets/synaisthisi_anim.gif" style="max-width: 100%;"></a>
+        </div>
+        <div class="collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+                <li routerLinkActive="active"><a routerLink="services">Services</a></li>
+                <li routerLinkActive="active"><a routerLink="topics">Topics</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <ng-template [ngIf]="!(authState$ | async).authenticated">
+                    <li routerLinkActive="active"><a routerLink="signup">Register</a></li>
+                    <li routerLinkActive="active"><a routerLink="signin">Login</a></li>
+                </ng-template>
+                <ng-template [ngIf]="(authState$ | async).authenticated">
+                    <li class="dropdown" appDropdown>
+                        <a class="dropdown-toggle" role="button">Manage <span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li routerLinkActive="active"><a routerLink="user/services/management">Start/Stop my Services</a></li>
+                            <li><a style="cursor: pointer;" 
+                                (click)="onExportServices()" 
+                                title="Export all services data in a json format file">Export Services</a></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown" appDropdown>
+                        <a class="dropdown-toggle" role="button">{{ (authState$ | async).userData.username }}<span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li routerLinkActive="active"><a routerLink="user/profile">Profile</a></li>
+                            <li><a style="cursor: pointer;" (click)="onLogout()">Logout</a></li>
+                        </ul>
+                    </li>
+                </ng-template>
+            </ul>
+        </div>
+    </div>
+</nav>
