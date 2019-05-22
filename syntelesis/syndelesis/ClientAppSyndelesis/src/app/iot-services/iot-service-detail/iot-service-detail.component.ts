@@ -1,8 +1,9 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router, ActivatedRoute, Params } from '@angular/router';
-import { Store } from '@ngrx/store';
+import { Store, select } from '@ngrx/store';
 
-import { Subscription } from 'rxjs';
+import { Subject } from 'rxjs';
+import { takeUntil, take } from 'rxjs/operators';
 
 import { IoTService } from '../iot-service.model';
 import * as fromApp from '../../store/app.reducers';
@@ -19,11 +20,13 @@ export class IoTServiceDetailComponent implements OnInit, OnDestroy {
   public detailedIoTService: IoTService;
   public permissionsText: string;
   public termsAccepted = false;
-  subscription: Subscription;
+  private ngUnsubscribe = new Subject<boolean>();
   public showTopicState = {
-    inputs: false,
-    outputs: false
+    inputs: true,
+    outputs: true
   };
+  public service_owner = false;
+  private current_user: string;
 
   constructor(private router: Router,
               private route: ActivatedRoute,
@@ -31,27 +34,44 @@ export class IoTServiceDetailComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.route.params
+    // Activated route among the few Observables that do not need unsubscribe (Router takes care)
       .subscribe((params: Params) => {
         this.termsAccepted = false;
         this.store.dispatch(new fromIoTActions.StartSelectIoTService(+params['id']));
       });
 
-      this.subscription = this.store.select('services')
+      this.store.pipe(
+        select(fromApp.getUserData),
+        take(1)
+      ).subscribe((userData$) => {
+        this.current_user = userData$.username;
+      });
+
+      this.store.pipe(
+        select('services'),
+        takeUntil(this.ngUnsubscribe)
+      )
       .subscribe((iotService$: fromIoTService.State) => {
         this.detailedIoTService = iotService$.selectedService;
         if (this.detailedIoTService) {
           if (this.detailedIoTService.subscriber) {
-              this.permissionsText = 'I can use this service.';
+              this.permissionsText = 'Service subscription enabled.';
             }else {
-              this.permissionsText = 'Please accept terms and request service usage.';
+              this.permissionsText = 'Accept terms of use in order to request service subscription.';
+            }
+          if (this.current_user === this.detailedIoTService.owner) {
+              this.service_owner = true;
+            } else {
+              this.service_owner = false;
             }
           }
       });
   }
 
   ngOnDestroy() {
-    this.showTopicState = {inputs:false, outputs: false}
-    this.subscription.unsubscribe();
+    this.showTopicState = {inputs: false, outputs: false};
+    this.ngUnsubscribe.next();
+    this.ngUnsubscribe.complete();
     this.store.dispatch(new fromIoTActions.StopSelectIoTService());
   }
 
@@ -73,7 +93,7 @@ export class IoTServiceDetailComponent implements OnInit, OnDestroy {
   }
 
   onNavigateToTopic(topicId) {
-    this.router.navigate(['/topics/', topicId])
+    this.router.navigate(['/topics/', topicId]);
   }
 
   r_btnState(): boolean {
@@ -84,5 +104,12 @@ export class IoTServiceDetailComponent implements OnInit, OnDestroy {
   requestIoTService(): void {
     this.store.dispatch(new fromIoTActions.RequestIoTService(this.detailedIoTService.id));
   }
+
+  onDeleteService(): void {
+    const id = this.detailedIoTService.id;
+    this.store.dispatch(new fromIoTActions.DeleteIoTService(id));
+  }
+
+  onEditService() {}
 
 }

@@ -3,15 +3,33 @@
     <app-search [searchType]=searchType></app-search>
     <hr>
   </div>
-  <div class="col-xs-7">
+  <div class="col-xs-5">
+    <select
+      [(ngModel)]="selectedOntology"
+      id="serviceOntology"
+      class="form-control"
+      title="Filter by Ontology"
+      (focus)="ontologyOpened()"
+      (change)="onSelectOntology()"
+      >
+       <option selected value="" style="color: lightgray">no ontology selected</option>
+       <option *ngFor="let ontology of serviceOntology" [value]="ontology">{{ontology}}</option>
+    </select>
+  </div>
+  <div class="col-xs-2">
       <button class="btn btn-success" (click)="onNewIoTService()">New Service</button>
   </div>
 </div>
+
 <div class="row">
+  <app-iot-service-list></app-iot-service-list>
+</div>
+
+<!-- <div class="row">
   <div class="col-md-5">
     <app-iot-service-list></app-iot-service-list>
   </div>
   <div class="col-md-7">
     <router-outlet></router-outlet>
   </div>
-</div>
+</div> -->

@@ -1,19 +1,32 @@
-import { NgModule } from '@angular/core';
+import { NgModule, ModuleWithProviders } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { DropdownDirective } from './dropdown.directive';
 import { SearchComponent } from './search/search.component';
+import { AlertComponent } from './alert/alert.component';
+import { AlertService } from './alert.service';
 
 @NgModule({
     declarations: [
         DropdownDirective,
-        SearchComponent
+        SearchComponent,
+        AlertComponent
     ],
     imports: [CommonModule],
     exports: [
         CommonModule,
         DropdownDirective,
-        SearchComponent
+        SearchComponent,
+        AlertComponent
     ]
 })
-export class SharedModule {}
+export class SharedModule {
+    static forRoot(): ModuleWithProviders {
+        return {
+            ngModule: SharedModule,
+            providers: [
+                AlertService
+            ]
+        };
+    }
+}

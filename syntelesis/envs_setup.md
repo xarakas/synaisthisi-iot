@@ -66,15 +66,47 @@ $ vim /etc/nginx/sites-available/syndelesis.conf
 #### syndelesis.conf file
 server {
   listen 80;
-  real_ip_header X-Forwarded-For;  // Forward to flask requester IP address
-  set_real_ip_from 127.0.0.1;       // Tell flask request is coming from localhost
   server_name localhost;
+  real_ip_header X-Forwarded-For;
+  set_real_ip_from 127.0.0.1;
 
   location / {
-    include uwsgi_params; // we are running the app using uwsgi (python app, see requirements file)
-    uwsgi_pass unix:/var/www/html/syndelesis/socket.sock;   // comunication of flask with nginx
+    include uwsgi_params;
+    uwsgi_pass unix:/var/www/html/syndelesis/socket.sock;
     uwsgi_modifier1 30;
-  }
+
+    set $cors '';
+    # exclude from cors protection:
+    #  * localhost, as mobile ionic app executes from localhost:8080
+    #  * 192.168.1.* for intranet debuging reasons 
+    if ($http_origin ~ '^https?://(localhost|192.168.1.*)') {
+        set $cors 'true';
+    }
+
+    if ($cors = 'true') {
+        add_header 'Access-Control-Allow-Origin' "$http_origin" always;
+        add_header 'Access-Control-Allow-Credentials' 'true' always;
+        add_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, DELETE, OPTIONS' always;
+        add_header 'Access-Control-Allow-Headers' 'Accept,Authorization,Cache-Control,Content-Type,DNT,If-Modified-Since,Keep-Alive,Origin,User-Agent,X-Requested-With' always;
+        # required to be able to read Authorization header in frontend
+        #add_header 'Access-Control-Expose-Headers' 'Authorization' always;
+    }
+   
+
+    if ($request_method = 'OPTIONS') {
+        # Tell client that this pre-flight info is valid for 20 days
+        add_header 'Access-Control-Max-Age' 1728000;
+        add_header 'Content-Type' 'text/plain charset=UTF-8';
+        add_header 'Content-Length' 0;
+        add_header 'Access-Control-Allow-Origin' "$http_origin" always;
+        add_header 'Access-Control-Allow-Credentials' 'true' always;
+        add_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, DELETE, OPTIONS' always;
+        add_header 'Access-Control-Allow-Headers' 'Accept,Authorization,Cache-Control,Content-Type,DNT,If-Modified-Since,Keep-Alive,Origin,User-Agent,X-Requested-With' always;
+        # required to be able to read Authorization header in frontend
+        #add_header 'Access-Control-Expose-Headers' 'Authorization' always;
+        return 204;
+    }
+ }
 }
 
 and then
@@ -115,12 +147,13 @@ $ git clone syndelesis-code.git .
 OR
 $ scp code .....
 $ mkdir log  (create logs folder for application)
-$ sudo apt-get install python-pip python3-dev (<--for uwsgi compile) libpq-dev (<--for psycopg2)
-$ pip install virtualenv
-$ sudo /usr/bin/easy_install virtualenv // to put it in /usr/bin
-$ virtualenv venv --python=python3.6
-$ source venv/bin/activate
-$ pip install -r requirements.txt
+
+$ apt-get install python3, python3-pip python3-dev build-essential libssl-dev libffi-dev libpq-dev (<--for psycopg2)
+$ cd /var/www/html/syndelesis
+$ python -m venv venv
+$ source venv/bin/activate  
+$ pip install wheel
+(vevn)$ pip install -r requirements.txt 
 (Here uwsgi python package is included which provides 'venv/bin/uwsgi)
 
 #### Create System Service
@@ -174,8 +207,6 @@ $ sudo systemctl reload nginx
 $ sudo systemctl restart nginx
 $ sudo systemctl start uwsgi-syndelesis
 $ sudo systemctl enable  uwsgi_syndelesis   # IMPORTANT: to enable service at boot
-$ vim views.py 
-   and remove ng build/serve etc
 $ vim syndelesis config.py startup.py 
    and put Production values
 
@@ -201,9 +232,12 @@ $ mosquitto_pub -h localhost -t topic3 -u vpitsilis -P qwerty -m "Hello" [-i cli
 
 
 ### install Python and make virtual environment
-$ apt-get install python3 virtualenv  
-$ virtualenv venv --python=python3.6
+$ apt-get install python3
+$ sudo apt-get install python3-dev build-essential libssl-dev libffi-dev
+$ cd /var/www/html/syndelesis
+$ python -m venv venv
 $ source venv/bin/activate  
+$ pip install wheel
 (vevn)$ pip install -r requirements.txt  
 
 

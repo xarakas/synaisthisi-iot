@@ -1,23 +1,28 @@
-import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 
 import { Store } from '@ngrx/store';
 
 import { Observable ,  Subject ,  combineLatest } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
-import * as fromApp from '../../store/app.reducers';
+import * as fromIoTServiceActions from '../store/iot-service.actions';
+
 import { IoTService } from '../../iot-services/iot-service.model';
-import * as fromUSerSpaceActions from '../store/user-space.actions';
+import { getServices, ServicesState } from '../../iot-services/store/iot-service.reducers';
+
+
 
 @Component({
   selector: 'app-service-management',
   templateUrl: './service-management.component.html',
   styleUrls: ['./service-management.component.css']
 })
-export class ServiceManagementComponent implements OnInit {
+export class ServiceManagementComponent implements OnInit, OnDestroy {
   private serviceState$: Observable<IoTService[]>;
   public pagedServices: IoTService[];
+
   pageEmitter$ = new Subject<boolean>();
+  private ngUnsubscribe = new Subject<boolean>();
 
   private startIndex = 0;
   private pageLength = 8;
@@ -32,14 +37,15 @@ export class ServiceManagementComponent implements OnInit {
     'start/stop'
   ];
 
-  constructor(private router: Router, private store: Store<fromApp.AppState>) {}
+  constructor(private store: Store<ServicesState>) {}
 
   ngOnInit() {
-    this.store.dispatch(new fromUSerSpaceActions.GetUserOwnedServices());
-    this.serviceState$ = this.store.select('services', 'services');
+    this.store.dispatch(new fromIoTServiceActions.GetUserOwnedServices());
+    this.serviceState$ = this.store.select(getServices);
 
-    const combined = combineLatest(this.serviceState$, this.pageEmitter$);
-    const subscribe = combined.subscribe(([p_services, pagerValue]) => {
+   combineLatest(this.serviceState$, this.pageEmitter$).pipe(
+    takeUntil(this.ngUnsubscribe)
+    ).subscribe(([p_services, pagerValue]) => {
       this.servicesLength = p_services.length;
       if (pagerValue) {
         if (this.startIndex < this.servicesLength - this.pageLength) {
@@ -61,6 +67,11 @@ export class ServiceManagementComponent implements OnInit {
     // to get things started, as combine kicks off when all subscribed have fired
   }
 
+  ngOnDestroy() {
+    this.ngUnsubscribe.next();
+    this.ngUnsubscribe.complete();
+  }
+
   setPage(up: boolean) {
     // up: true/false means next/previous page
     this.pageEmitter$.next(up);
@@ -71,21 +82,21 @@ export class ServiceManagementComponent implements OnInit {
     const uploadData = new FormData();
     uploadData.append('service_file', selectedFile, selectedFile.name);
     this.store.dispatch(
-      new fromUSerSpaceActions.UploadServiceFile({ service_id, uploadData })
+      new fromIoTServiceActions.UploadServiceFile({ service_id, uploadData })
     );
   }
 
   onToggleService(service_id: number, start: boolean, paramString: string) {
     if (start) {
       this.store.dispatch(
-        new fromUSerSpaceActions.StartService({
+        new fromIoTServiceActions.StartService({
           service_id: service_id,
           serviceParam: paramString
         })
       );
     } else {
       this.store.dispatch(
-        new fromUSerSpaceActions.StopService({
+        new fromIoTServiceActions.StopService({
           service_id: service_id
         })
       );
@@ -94,7 +105,7 @@ export class ServiceManagementComponent implements OnInit {
 
   onItemSelected(item: IoTService) {
     this.store.dispatch(
-      new fromUSerSpaceActions.GetServiceLogFile({
+      new fromIoTServiceActions.GetServiceLogFile({
         service_id: item.id
       })
     );

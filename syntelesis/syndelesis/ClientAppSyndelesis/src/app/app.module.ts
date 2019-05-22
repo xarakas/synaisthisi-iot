@@ -12,15 +12,12 @@ import { CoreModule } from './core/core.module';
 import { SharedModule } from './shared/shared.module';
 import { AuthModule } from './auth/auth.module';
 import { TopicsModule } from './topics/topics.module';
-import { IotServicesModule } from './iot-services/iot-services.module';
-import { UserSpaceModule } from './user-space/user-space.module';
 import { WildcardRoutingModule } from './app-routing/wild-card-routing.module';
 import { reducers } from './store/app.reducers';
 import { AuthEffects } from './auth/store/auth.effects';
 import { TopicEffects } from './topics/store/topic.efects';
-import { IoTServiceEffects } from './iot-services/store/iot-service.effects';
-import { UserSpaceEffects } from './user-space/store/user-space.effects';
 import { environment } from '../environments/environment';
+
 
 @NgModule({
   declarations: [
@@ -30,19 +27,17 @@ import { environment } from '../environments/environment';
     BrowserModule,
     HttpClientModule,
     CoreModule,
-    SharedModule,
-    AuthModule,
     TopicsModule,
-    IotServicesModule,
-    UserSpaceModule,
+    AuthModule.forRoot(),
+    SharedModule.forRoot(),
     WildcardRoutingModule,
     StoreModule.forRoot(reducers),
-    EffectsModule.forRoot([AuthEffects, TopicEffects, IoTServiceEffects, UserSpaceEffects]),
+    EffectsModule.forRoot([AuthEffects, TopicEffects]),
     StoreRouterConnectingModule,
     !environment.production ? StoreDevtoolsModule.instrument() : []
   ],
   providers: [
-    Title
+    Title,
   ],
   bootstrap: [AppComponent]
 })

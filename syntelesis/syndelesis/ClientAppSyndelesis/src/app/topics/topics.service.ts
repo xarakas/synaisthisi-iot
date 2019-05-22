@@ -43,6 +43,13 @@ export class TopicsService {
     .pipe(catchError((err: HttpErrorResponse) => observableThrowError(err.error)));
   }
 
+  deleteUserTopic(user_id: number, topic_id: number): Observable<any> {
+    return this.httpClient.delete(
+        `${this.url}users/${user_id}/topics/${topic_id}`, { observe: 'body', responseType: 'json' }
+    )
+    .pipe(catchError((err: HttpErrorResponse) => observableThrowError(err.error)));
+  }
+
   searchTopics(term: string): Observable<Topic[]> {
     return this.httpClient.get<Topic[]>(
         `${this.url}topics?term=${term}`, { observe: 'body', responseType: 'json' }

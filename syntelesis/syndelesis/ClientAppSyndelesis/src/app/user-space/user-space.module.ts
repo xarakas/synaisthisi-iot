@@ -1,20 +1,22 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
+import { EffectsModule } from '@ngrx/effects';
 
 import { ProfileComponent } from './profile/profile.component';
 import { UserSpaceService } from './user-space.service';
 import { UserSpaceRoutingModule } from './user-space-routing.module';
-import { ServiceManagementComponent } from './service-management/service-management.component';
+import { UserSpaceEffects } from './store/user-space.effects';
+
 
 @NgModule({
   imports: [
     CommonModule,
-    UserSpaceRoutingModule,
     FormsModule,
-    ReactiveFormsModule
+    UserSpaceRoutingModule,
+    EffectsModule.forFeature([UserSpaceEffects])
   ],
-  declarations: [ProfileComponent, ServiceManagementComponent],
+  declarations: [ProfileComponent],
   providers: [
     UserSpaceService
   ]

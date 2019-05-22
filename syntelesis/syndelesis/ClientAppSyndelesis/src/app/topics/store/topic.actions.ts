@@ -11,6 +11,8 @@ export const ADD_TOPIC = '[Topics] Add topic';
 export const STOP_ADD_TOPIC = '[Topics] Stop add topic';
 export const REQUEST_TOPIC = '[Topics] Request topic';
 export const STOP_REQUEST_TOPIC = '[Topics] Stop request topic';
+export const DELETE_TOPIC = '[Topics] Delete topic';
+export const STOP_DELETE_TOPIC = '[Topics] Stop delete topic';
 export const NET_SUCCESS = '[Topics] Net success';
 export const REDIRECT = '[Topics] Redirect';
 export const NET_FAILED = '[Topics] Net failed';
@@ -70,6 +72,18 @@ export class StopRequestTopic implements Action {
     constructor(public payload: Topic) {}
 }
 
+export class DeleteTopic implements Action {
+  readonly type = DELETE_TOPIC;
+
+  constructor(public payload: number) {}
+}
+
+export class StopDeleteTopic implements Action {
+  readonly type = STOP_DELETE_TOPIC;
+
+  constructor(public payload: number) {}
+}
+
 export class Search implements Action {
     readonly type = SEARCH;
 
@@ -114,6 +128,8 @@ export type TopicActions = FetchTopics|
                            StopAddTopic|
                            RequestTopic|
                            StopRequestTopic|
+                           DeleteTopic|
+                           StopDeleteTopic|
                            ClearTopicsState|
                            Redirect|
                            NetSuccess|

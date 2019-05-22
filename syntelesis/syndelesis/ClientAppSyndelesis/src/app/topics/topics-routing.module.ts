@@ -8,12 +8,12 @@ import { TopicsStartComponent } from './topics-start/topics-start.component';
 import { TopicDetailComponent } from './topic-detail/topic-detail.component';
 
 const topicsRoutes: Routes = [
-    {// path: 'recipes', component: RecipesComponent, children: [ # Dynamic Loading ...
+    {
      path: 'topics', component: TopicsComponent, canActivate: [AuthGuardService], children: [
         {path: '', component: TopicsStartComponent},
-        // {path: 'new', component: RecipeEditComponent, canActivate: [AuthGuardService]},
+        // {path: 'new', component: TopicEditComponent, canActivate: [AuthGuardService]},
         {path: ':id', component: TopicDetailComponent},
-        // {path: ':id/edit', component: RecipeEditComponent, canActivate: [AuthGuardService]},
+        // {path: ':id/edit', component: TopicEditComponent, canActivate: [AuthGuardService]},
       ] }
 ];
 
@@ -22,7 +22,6 @@ const topicsRoutes: Routes = [
     imports: [RouterModule.forChild(topicsRoutes)],
     exports: [RouterModule],
     providers: [
-        AuthGuardService
     ]
 })
 export class TopicsRoutingModule {}

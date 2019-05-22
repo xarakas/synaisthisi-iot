@@ -1,10 +1,11 @@
-import { Component, OnInit } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
-import { Store } from '@ngrx/store';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Store, select } from '@ngrx/store';
 import { Observable ,  Subject ,  combineLatest } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 import { IoTService } from '../iot-service.model';
 import * as fromApp from '../../store/app.reducers';
+import { getServices } from '../store/iot-service.reducers';
 import * as fromIoTServiceActions from '../store/iot-service.actions';
 
 @Component({
@@ -12,25 +13,27 @@ import * as fromIoTServiceActions from '../store/iot-service.actions';
   templateUrl: './iot-service-list.component.html',
   styleUrls: ['./iot-service-list.component.css']
 })
-export class IoTServiceListComponent implements OnInit {
+export class IoTServiceListComponent implements OnInit, OnDestroy {
   private serviceState$: Observable<IoTService[]>;
-  public pagedServices: IoTService[];
-  pageEmitter$ = new Subject<boolean>();
+  private pageEmitter$ = new Subject<boolean>();
+  private ngUnsubscribe = new Subject<boolean>();
 
+  public pagedServices: IoTService[];
   private startIndex = 0;
-  private pageLength = 8;
+  public pageLength = 9;
   public servicesLength;
 
-  constructor(private router: Router,
-              private route: ActivatedRoute,
-              private store: Store<fromApp.AppState>) {}
+  constructor(private store: Store<fromApp.AppState>) {}
 
   ngOnInit() {
     this.store.dispatch(new fromIoTServiceActions.FetchIoTServices());
-    this.serviceState$ = this.store.select('services', 'services');
+    this.serviceState$ = this.store.pipe(
+      select(getServices)
+      );
 
-    const combined = combineLatest(this.serviceState$, this.pageEmitter$);
-    const subscribe = combined.subscribe(
+    combineLatest(this.serviceState$, this.pageEmitter$).pipe(
+      takeUntil(this.ngUnsubscribe)
+      ).subscribe(
       ([p_services, pagerValue]) => {
         this.servicesLength = p_services.length;
         if (pagerValue) {
@@ -52,6 +55,11 @@ export class IoTServiceListComponent implements OnInit {
     );
     this.pageEmitter$.next(false); // needed the first time we land here,
                                    // to get things started, as combine kicks off when all subscribed have fired
+  }
+
+  ngOnDestroy() {
+    this.ngUnsubscribe.next();
+    this.ngUnsubscribe.complete();
   }
 
   setPage(up: boolean) { // up: true/false means next/previous page

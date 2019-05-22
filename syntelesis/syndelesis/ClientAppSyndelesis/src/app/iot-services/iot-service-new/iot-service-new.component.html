@@ -3,12 +3,12 @@
       <form [formGroup]="IoTServiceForm" (ngSubmit)="onSubmit()">
         <div class="row">
           <div class="col-xs-12">
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               class="btn btn-success"
               [disabled]="!IoTServiceForm.valid">Save</button>
-            <button 
-              type="button" 
+            <button
+              type="button"
               class="btn btn-danger"
               (click)="onCancel()">Cancel</button>
           </div>
@@ -51,6 +51,28 @@
             </div>
           </div>
         </div>
+
+        <div class="row">
+          <div class="col-xs-12">
+            <div class="form-group">
+              <label for="serviceOntology">ServiceOntology</label>
+              <button type="button"
+                      style="cursor:pointer"
+                      style="float: right"
+                      class="btn"
+                      (click)="getOntology()">Refresh</button>
+              <select
+                id="serviceOntology"
+                formControlName="serviceOntology"
+                class="form-control">
+                <!-- <option *ngFor="let ontology of (serviceOntologyState$ | async)" [value]="ontology">{{ontology}}</option> -->
+                <option *ngFor="let ontology of serviceOntology" [value]="ontology">{{ontology}}</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+
         <div class="row">
           <div class="col-xs-12">
             <div class="form-group">
@@ -67,8 +89,8 @@
         <div class="row">
           <div class="col-xs-12">
             <div class="btn-group" appDropdown>
-              <button 
-                type="button" 
+              <button
+                type="button"
                 class="btn btn-primary dropdown-toggle">
                 Add Topics <span class="caret"></span>
               </button>
@@ -85,9 +107,9 @@
         <span *ngIf="showTopicState.inputs">
           <div class="row">
             <div class="col-xs-7" formArrayName="inputTopics">
-              <div 
+              <div
                 class="row"
-                *ngFor="let inputTopicCtl of IoTServiceForm.get('inputTopics')['controls'], let i=index"
+                *ngFor="let inputTopicCtl of getControls('inputTopics'); let i=index"
                 [formGroupName]="i"
                 style="margin-top: 10px;">
                 <div class="col-xs-3">
@@ -104,7 +126,7 @@
                     rows="3">
                 </div>
                 <div class="col-xs-2">
-                  <button 
+                  <button
                     class="btn btn-danger"
                     type="button"
                     (click)="onDeleteInputTopic(i)">X</button>
@@ -113,23 +135,23 @@
               <hr>
               <div class="row">
                 <div class="col-xs-4">
-                  <button 
-                    class="btn btn-success" 
-                    (click)="onAddInputTopic()" 
+                  <button
+                    class="btn btn-success"
+                    (click)="onAddInputTopic()"
                     type="button"> Add Input Topic</button>
                 </div>
                 <div class="col-xs-4">
-                  <button 
-                    class="btn btn-success" 
+                  <button
+                    class="btn btn-success"
                     (click)="onShowTopicsChange(5)"
                     title="Add from existing topics whith SUB permissions"
                     type="button"> Add Existing Topics</button>
                 </div>
-              </div>  
+              </div>
             </div>
             <span *ngIf="showTopicState.existing_inputs">
               <div class="col-xs-5">
-              <!-- Disabled for the moment as search only works for all topics (server work needed) 
+              <!-- Disabled for the moment as search only works for all topics (server work needed)
                 <div class="div row">
                   <div class="col-xs-12">
                     <app-search [searchType]=searchType></app-search>
@@ -137,10 +159,10 @@
                   </div>
                 </div> -->
                 <div class="col-xs-12">
-                  <app-topic-list 
+                  <app-topic-list
                     [embeddingComponent]=embeddingComponent
                     (topicSelected)="onAddExistingInputTopic($event)"></app-topic-list>
-                </div> 
+                </div>
               </div>
             </span>
           </div>
@@ -149,9 +171,9 @@
         <span *ngIf="showTopicState.outputs">
           <div class="row">
             <div class="col-xs-12" formArrayName="outputTopics">
-              <div 
+              <div
                 class="row"
-                *ngFor="let outputTopicCtl of IoTServiceForm.get('outputTopics')['controls'], let i=index"
+                *ngFor="let outputTopicCtl of getControls('outputTopics'); let i=index"
                 [formGroupName]="i"
                 style="margin-top: 10px;">
                 <div class="col-xs-3">
@@ -168,7 +190,7 @@
                     rows="3">
                 </div>
                 <div class="col-xs-2">
-                  <button 
+                  <button
                     class="btn btn-danger"
                     type="button"
                     (click)="onDeleteOutputTopic(i)">X</button>
@@ -177,17 +199,17 @@
               <hr>
               <div class="row">
                 <div class="col-xs-12">
-                  <button 
-                    class="btn btn-success" 
-                    (click)="onAddOutputTopic()" 
+                  <button
+                    class="btn btn-success"
+                    (click)="onAddOutputTopic()"
                     type="button"> Add Output Topic</button>
                 </div>
-              </div>  
+              </div>
             </div>
           </div>
         </span>
 
-        
+
       </form>
     </div>
   </div>

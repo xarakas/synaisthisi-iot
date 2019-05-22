@@ -1,5 +1,6 @@
 import { Topic } from '../../shared/topic.model';
 import * as fromTopicActions from './topic.actions';
+import { createFeatureSelector, createSelector } from '@ngrx/store';
 
 export interface State {
     topics: Topic[];
@@ -49,6 +50,16 @@ export function topicReducer (state = initialState,
                 ...state,
                 editedTopic: updated_topic
             };
+        case fromTopicActions.STOP_DELETE_TOPIC:
+            const updated_topics = [...state.topics].filter((item) => {
+              return item.id !== action.payload;
+            });
+            return {
+                ...state,
+                topics: updated_topics,
+                editedTopic: null,
+                editedTopicIndex: -1
+            };
             case fromTopicActions.CLEAR_TOPICS_STATE:
             {
                 return {
@@ -56,22 +67,8 @@ export function topicReducer (state = initialState,
                     topics: [],
                     editedTopic: null,
                     editedTopicIndex: -1
-                }
+                };
             }
-            // const old_topic = state.topics.find(r_topic => r_topic.id === action.payload.id);
-            // const updated_topic = {
-            //     ...old_topic,
-            //     ...action.payload
-            // };
-            // const all_topics = [...state.topics];
-            // const index = all_topics.indexOf(old_topic);
-            // if (index !== -1) {
-            //     all_topics[index] = updated_topic;
-            // }
-            // return {
-            //     ...state,
-            //     topics: all_topics
-            // };
         // case fromTopicActions.ADD_TOPICS:
         //     return {
         //         ...state,
@@ -81,5 +78,9 @@ export function topicReducer (state = initialState,
             return state;
     }
 }
+
+export const _getTopics = (state: State) => state.topics;
+export const getTopicsState = createFeatureSelector<State>('topics');
+export const getTopics = createSelector(getTopicsState, _getTopics);
 
 

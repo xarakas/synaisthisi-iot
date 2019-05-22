@@ -17,10 +17,15 @@
                     <li class="dropdown" appDropdown>
                         <a class="dropdown-toggle" role="button">Manage <span class="caret"></span></a>
                         <ul class="dropdown-menu">
-                            <li routerLinkActive="active"><a routerLink="user/services/management">Start/Stop my Services</a></li>
-                            <li><a style="cursor: pointer;" 
-                                (click)="onExportServices()" 
+                            <li routerLinkActive="active"><a routerLink="services/management">Start/Stop my Services</a></li>
+                            <li><a style="cursor: pointer;"
+                                (click)="onExportServices()"
                                 title="Export all services data in a json format file">Export Services</a></li>
+                            <li><a style="cursor: pointer;"
+                              id="servicesFile2"
+                              (click)="onImportServices()"
+                              title="Import services from json file">Import Services</a></li>
+                            <li><input #servicesFile id="servicesFile" style="display: none" type="file" (change)="onFileChanged($event)" class="form-control"/></li>
                         </ul>
                     </li>
                     <li class="dropdown" appDropdown>

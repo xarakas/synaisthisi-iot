@@ -22,52 +22,6 @@ export class UpdateUserData implements Action {
   constructor(public payload: { email: string; password: string }) {}
 }
 
-export class GetUserOwnedServices implements Action {
-  readonly type = GET_USER_OWNED_SERVICES;
-}
-
-export class UploadServiceFile implements Action {
-  readonly type = UPLOAD_SERVICE_FILE;
-
-  constructor(public payload: { service_id: number; uploadData: FormData }) {}
-}
-
-export class StartService implements Action {
-  readonly type = START_SERVICE;
-
-  constructor(
-    public payload: { service_id: number; serviceParam: string }
-  ) {}
-}
-
-export class StopService implements Action {
-  readonly type = STOP_SERVICE;
-
-  constructor(
-    public payload: { service_id: number}
-  ) {}
-}
-
-export class GetServiceStatus implements Action {
-  readonly type = GET_SERVICE_STATUS;
-
-  constructor(
-    public payload: { service_id: number}
-  ) {}
-}
-
-export class ExportUserServices implements Action {
-  readonly type = EXPORT_SERVICES;
-}
-
-export class GetServiceLogFile implements Action {
-  readonly type = GET_SERVICE_LOG_FILE;
-
-  constructor(
-    public payload: { service_id: number}
-  ) {}
-}
-
 export class NetFailed implements Action {
   readonly type = NET_FAILED;
 
@@ -83,12 +37,5 @@ export class NetSuccess implements Action {
 export type UserSpaceActions =
   | GetUserData
   | UpdateUserData
-  | GetUserOwnedServices
-  | UploadServiceFile
-  | StartService
-  | StopService
-  | GetServiceStatus
-  | ExportUserServices
-  | GetServiceLogFile
   | NetSuccess
   | NetFailed;

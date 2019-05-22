@@ -19,7 +19,7 @@ import * as fromAuthActions from './auth.actions';
 import * as fromIoTServiceActions from '../../iot-services/store/iot-service.actions';
 import * as fromTopicActions from '../../topics/store/topic.actions';
 import { AuthService } from '../auth.service';
-import { AlertService } from '../../core/alert.service';
+import { AlertService } from '../../shared/alert.service';
 import { AuthResponse } from '../../shared/authData.model';
 
 @Injectable()

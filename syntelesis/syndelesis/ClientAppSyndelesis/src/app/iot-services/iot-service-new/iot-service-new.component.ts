@@ -1,12 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl, FormArray, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Store } from '@ngrx/store';
+import { Store, select } from '@ngrx/store';
 
 import { Topic } from '../../shared/topic.model';
 import { IoTService } from '../iot-service.model';
 import * as fromApp from '../../store/app.reducers';
 import * as fromIoTServiceActions from '../store/iot-service.actions';
+import { Observable } from 'rxjs';
+import { getServiceOntology } from '../store/iot-service.reducers';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-iot-service-new',
@@ -18,6 +21,8 @@ export class IotServiceNewComponent implements OnInit {
   searchType = 'topic';
   embeddingComponent = 'NewService';
   public service_types = ['Actuator', 'Sensor', 'Processor'];
+  public serviceOntologyState$: Observable<string[]>;
+  public serviceOntology: string[];
 
   public showTopicState = {
     inputs: false,
@@ -29,7 +34,25 @@ export class IotServiceNewComponent implements OnInit {
               private store: Store<fromApp.AppState>) { }
 
   ngOnInit() {
+    // this.store.dispatch(new fromIoTServiceActions.GetServiceOntology());
+    // this.serviceOntologyState$ = this.store.pipe(
+    //   select(getServiceOntology),
+    //   map(arr => arr.sort())
+    //   );
+    this.store.pipe(
+      select(getServiceOntology),
+      map(arr => arr.sort())
+      ).subscribe((s_ontology: string[]) => {
+        this.serviceOntology = s_ontology;
+        if (this.serviceOntology.length === 0) {
+          this.store.dispatch(new fromIoTServiceActions.GetServiceOntology());
+        }
+      });
     this.initForm();
+  }
+
+  getOntology() {
+    this.store.dispatch(new fromIoTServiceActions.GetServiceOntology());
   }
 
   private initForm() {
@@ -40,6 +63,7 @@ export class IotServiceNewComponent implements OnInit {
       'name': new FormControl(null, Validators.required),
       'description': new FormControl(null, Validators.required),
       'serviceType': new FormControl(null, Validators.required),
+      'serviceOntology': new FormControl(null, Validators.required),
       'location' : new FormControl(null, Validators.required),
       'inputTopics': inputTopics,
       'outputTopics': outputTopics,
@@ -103,6 +127,10 @@ export class IotServiceNewComponent implements OnInit {
     );
   }
 
+  getControls(topicsCategory) {
+    return (<FormArray>this.IoTServiceForm.get(topicsCategory)).controls;
+}
+
   onCancel() {
     this.router.navigate(['services']);
   }
@@ -112,6 +140,7 @@ export class IotServiceNewComponent implements OnInit {
       this.IoTServiceForm.value['name'],
       this.IoTServiceForm.value['description'],
       this.IoTServiceForm.value['serviceType'],
+      this.IoTServiceForm.value['serviceOntology'],
       this.IoTServiceForm.value['location'],
     );
     newIoTService.input_topics = this.IoTServiceForm.value['inputTopics'];

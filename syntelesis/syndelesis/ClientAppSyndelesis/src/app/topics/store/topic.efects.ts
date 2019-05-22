@@ -17,7 +17,7 @@ import * as fromApp from '../../store/app.reducers';
 import * as fromTopicActions from './topic.actions';
 import { Topic, TopicSearchType } from '../../shared/topic.model';
 import { TopicsService } from '../topics.service';
-import { AlertService } from '../../core/alert.service';
+import { AlertService } from '../../shared/alert.service';
 
 @Injectable()
 export class TopicEffects {
@@ -159,6 +159,45 @@ export class TopicEffects {
       );
     })
   );
+
+  @Effect()
+  deleteTopic = this.actions$.pipe(
+    ofType(fromTopicActions.DELETE_TOPIC),
+    map((action: fromTopicActions.DeleteTopic) => {
+      return action.payload;
+    }),
+    withLatestFrom(this.store.select('auth')),
+    switchMap(([topic_id, state]) => {
+      const user_id = state.userData.id;
+      return this.service.deleteUserTopic(user_id, topic_id).pipe(
+        mergeMap((response: string) => {
+          console.log(response);
+          return [
+            {
+              type: fromTopicActions.STOP_DELETE_TOPIC,
+              payload: topic_id
+            },
+            {
+              type: fromTopicActions.REDIRECT,
+              payload: 'topics'
+            },
+            // {
+            //   type: fromTopicActions.SEARCH,
+            //   payload: ''
+            // },
+            {
+              type: fromTopicActions.NET_SUCCESS,
+              payload: { message: response['message'] }
+            }
+          ];
+        }),
+        catchError(error => {
+          return of({ type: fromTopicActions.NET_FAILED, payload: error });
+        })
+      );
+    })
+  );
+
 
   @Effect()
   search = this.actions$.pipe(

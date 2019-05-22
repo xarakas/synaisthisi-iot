@@ -1,13 +1,16 @@
-<a 
-  style="cursor: pointer;"
-  [routerLink] = "[iot_service.id]"
-  routerLinkActive="active"
-  class="list-group-item clearfix"
-  style="margin-top: 2px;">
-    <div class="pull-left" >
-        <h4 class="list-group-item-heading">{{ iot_service.name }}</h4>
-        <p class="list-group-item-text">{{ iot_service.description }}</p>
-        <p class="list-group-item-text">Developed by: {{iot_service.owner}}</p>
-        <p class="list-group-item-text">Located at: {{iot_service.location}}</p>
-    </div>
-</a>
+<section class="service__card">
+  <a
+    style="cursor: pointer;"
+    [routerLink] = "[iot_service.id]"
+    routerLinkActive="active"
+    class="list-group-item clearfix"
+    style="margin-top: 2px;">
+      <div  >
+          <h4 class="list-group-item-heading service-name__text">{{ iot_service.name }}</h4>
+          <div class="separator"></div>
+          <p class="list-group-item-text description">{{ iot_service.description }}</p>
+          <p class="list-group-item-text meta">Located at: {{iot_service.location}}</p>
+          <div class="author"><p class="ex">by {{ iot_service.owner }}</p></div>
+      </div>
+  </a>
+</section>

@@ -1,27 +1,30 @@
-import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
+import { Component, OnInit, Input, EventEmitter, Output, OnDestroy } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { Observable ,  Subscription ,  Subject ,  combineLatest } from 'rxjs';
+import { Observable,  Subject ,  combineLatest } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 import { Topic, TopicSearchType } from '../../shared/topic.model';
 import * as fromApp from '../../store/app.reducers';
 import * as fromTopicActions from '../store/topic.actions';
+import { getTopics } from '../store/topic.reducers';
+
 
 @Component({
   selector: 'app-topic-list',
   templateUrl: './topic-list.component.html',
   styleUrls: ['./topic-list.component.css']
 })
-export class TopicListComponent implements OnInit {
+export class TopicListComponent implements OnInit, OnDestroy {
   // The following two are used to act upon topic selection when copmonent embedded in New Service Component
   @Input() embeddingComponent: string = null;
   @Output() topicSelected = new EventEmitter<Topic>();
 
   private topicsState$: Observable<Topic[]>;
-  public pagedTopics: Topic[];
-  subscription: Subscription;
-  pageEmitter = new Subject<boolean>();
+  private pageEmitter = new Subject<boolean>();
+  private ngUnsubscribe = new Subject<boolean>();
 
+  public pagedTopics: Topic[];
   private startIndex = 0;
   public pageLength = 8;
   public topicsLength;
@@ -38,10 +41,11 @@ export class TopicListComponent implements OnInit {
       default:
         this.store.dispatch(new fromTopicActions.FetchTopics(TopicSearchType.allTopics));
     }
-    this.topicsState$ = this.store.select('topics', 'topics');
+    this.topicsState$ = this.store.select(getTopics);
 
-    const combined = combineLatest(this.topicsState$, this.pageEmitter);
-    const subscribe = combined.subscribe(
+    combineLatest(this.topicsState$, this.pageEmitter).pipe(
+      takeUntil(this.ngUnsubscribe)
+      ).subscribe(
       ([p_topics, pagerValue]) => {
         this.topicsLength = p_topics.length;
         if (pagerValue) {
@@ -62,6 +66,11 @@ export class TopicListComponent implements OnInit {
       }
     );
     this.pageEmitter.next(false); // to get things started
+  }
+
+  ngOnDestroy() {
+    this.ngUnsubscribe.next();
+    this.ngUnsubscribe.complete();
   }
 
   setPage(up: boolean) {

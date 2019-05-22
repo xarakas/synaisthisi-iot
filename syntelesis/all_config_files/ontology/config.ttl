@@ -1,0 +1,28 @@
+@prefix ns: <http://www.openrdf.org/config/sail/native#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix rep: <http://www.openrdf.org/config/repository#> .
+@prefix sail: <http://www.openrdf.org/config/sail#> .
+@prefix sb: <http://www.openrdf.org/config/sail/base#> .
+@prefix sr: <http://www.openrdf.org/config/repository/sail#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<#1> a rep:Repository;
+  rep:repositoryID "1";
+  rep:repositoryImpl [
+      rep:repositoryType "openrdf:SailRepository";
+      sr:sailImpl [
+          sail:delegate [
+              sail:delegate [
+                  sail:delegate [
+                      sail:sailType "openrdf:NativeStore";
+                      sb:evaluationStrategyFactory "org.eclipse.rdf4j.query.algebra.evaluation.impl.StrictEvaluationStrategyFactory";
+                      ns:tripleIndexes "spoc,posc"
+                    ];
+                  sail:sailType "openrdf:DedupingInferencer"
+                ];
+              sail:sailType "rdf4j:SchemaCachingRDFSInferencer"
+            ];
+          sail:sailType "openrdf:SpinSail"
+        ]
+    ];
+  rdfs:label "SYNAISTHISI_v3" .

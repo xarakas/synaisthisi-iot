@@ -15,6 +15,7 @@ export class IoTService {
     public name: string,
     public description: string,
     public service_type: string,
+    public service_ontology: string,
     public location: string
   ) {}
 }

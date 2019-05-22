@@ -1,0 +1,521 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+     
+   <!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+   <!-- Latest compiled and minified JavaScript -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+    <script src='https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js' type="text/javascript"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <script src='js/config.js' type="text/javascript"></script>
+    <script src='js/mqttws31.js' type="text/javascript"></script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/jquery.flot.js" type="text/javascript"></script>
+<title>
+Training site
+</title>
+</head>
+<body>
+    
+   <nav class="navbar navbar-default">
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="#">SYNAISTHISI</a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li class="active"><a href="#">Link <span class="sr-only">(current)</span></a></li>
+        <li><a href="#">Link</a></li>
+        <li><a id="connLabel" style="color:red">Disconnected</a></li>
+       <!-- <li><a href="#" class="alert alert-success container-fluid" role="alert">Connected</a></li> -->
+      </ul>
+      
+      
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
+    
+    
+    
+    
+    
+    <script type="text/javascript">
+    var mqtt;
+    var reconnectTimeout = 2000;
+    var forced = false;
+    var topicslist = [];
+    var valueslist = [];
+    var totalpwhistory = [];
+    for (var j =0;j<1000;j++){
+        totalpwhistory.push([j+1, 0.0]);
+    }
+    //var host = 'iot.synaisthisi.iit.demokritos.gr';
+    //var port = '1883';
+       
+       
+       
+    function MQTTconnect() {
+        mqtt = new Paho.MQTT.Client(
+                        host,
+                        port,
+                        "web_" + parseInt(Math.random() * 100,
+                        10));
+        var options = {
+            timeout: 10,
+            onSuccess: onConnect,
+            onFailure: function (message) {
+                $('#status').val("Connection failed: " + message.errorMessage + "Retrying");
+                setTimeout(MQTTconnect, reconnectTimeout);
+            }
+        };
+
+        mqtt.onConnectionLost = onConnectionLost;
+        mqtt.onMessageArrived = onMessageArrived;
+
+        if (username != null) {
+            options.userName = username;
+            options.password = password;
+        }
+        console.log("Host="+ host + ", port=" + port + " TLS = " + useTLS + " username=" + username + " password=" + password);
+        mqtt.connect(options);
+    }
+
+    function MQTTdisconnect(){
+        console.log("Disconnect somehow");
+        if (mqtt){
+            //forced = true;
+            mqtt.disconnect();
+            toggleConn(connLabel,concontrol);
+            //forced = false;
+        }
+       // else {
+        //    toggleConn(connLabel,concontrol);
+        //}
+        mqtt = null;
+    }
+       
+    function onConnect() {
+        $('#status').val('Connected to ' + host + ':' + port);
+        // Connection succeeded; subscribe to our topic
+        mqtt.subscribe(topic, {qos: 0});
+        $('#topic').val(topic);
+        toggleConn(connLabel,concontrol);
+        if ($('#concontrol').hasClass("disabled")){
+            $('#concontrol').html("Press to Disconnect");
+            $('#concontrol').removeClass("disabled");
+        }
+    }
+
+    function onConnectionLost(response) {
+        //$('#topic').val("ON CONLOST: " + forced);
+        if (!forced){
+            connLabel.innerHTML === "Disconnected";
+            toggleConn(connLabel,concontrol);
+            $('#concontrol').addClass("disabled");
+            $('#concontrol').html("Reconnecting.. disabled temporarily");
+            setTimeout(MQTTconnect, reconnectTimeout);
+            $('#status').val("connection lost: " + responseObject.errorMessage + ". Reconnecting");
+        }
+        else {
+            $('#status').val("connection Closed");
+        }
+
+    };
+
+    function onMessageArrived(message) {
+
+        var topic = message.destinationName;
+        var payload = message.payloadString;
+        //console.log("edw?");
+        if (topicslist.indexOf(topic)<0){
+            topicslist.push(topic);
+            valueslist.push(payload);
+            //console.log("tha eprepe");
+            updateTLIST();
+            updateVLIST();
+        }
+        else{
+            valueslist[topicslist.indexOf(topic)]=payload;
+            updateVLIST();
+            }
+        
+        if (topic==='/demokritos/iit/aigaio/plugwise/power_consumption/total'){
+        //if (topic==='/demokritos/outdoors/s1/temperature/'){
+        //if (topic==='/audio/level/pik01'){
+            updategraphvalues(payload);
+            
+        }
+        
+        //$('#ws').prepend('<li>' + topic + ' = ' + payload + '</li>');
+        $('#latest_topic').html(topic) ;
+        $('#latest_msg').html(payload) ;
+    };
+
+    
+    function updategraphvalues(mypayload){
+            
+            //totalpwhistory.shift();
+            for (var j =0;j<999;j++){
+                totalpwhistory[j][1]= totalpwhistory[j+1][1];
+            }
+            //totalpwhistory.pop();
+            //totalpwhistory.push([100, parseFloat(mypayload)]);
+            //console.log(totalpwhistory);
+            totalpwhistory[999][1]=parseFloat(mypayload);
+        
+    }
+
+   // $(document).ready(function() {
+    //    MQTTconnect();
+    //});
+    function updateTLIST(){
+           $('#TLIST').html(topicslist.join('<br/>'));
+    }
+        
+    function updateVLIST(){
+           $('#VLIST').html(valueslist.join('<br/>'));
+    }   
+        
+        
+        
+        $(function() {
+		// We use an inline data source in the example, usually data would
+		// be fetched from a server
+		var data = [],
+			totalPoints = 1000;
+		
+		// Set up the control widget
+		var updateInterval = 3000;
+		$("#updateInterval").val(updateInterval).change(function () {
+			var v = $(this).val();
+			if (v && !isNaN(+v)) {
+				updateInterval = +v;
+				if (updateInterval < 1) {
+					updateInterval = 1;
+				} else if (updateInterval > 5000) {
+					updateInterval = 5000;
+				}
+				$(this).val("" + updateInterval);
+			}
+		});
+            
+        
+		//var plot = $.plot("#placeholder", [ getRandomData() ], {
+		var plot = $.plot("#placeholder", [totalpwhistory], {
+			series: {
+				shadowSize: 0	// Drawing is faster without shadows
+			},
+			yaxis: {
+				min: -10,
+				max: 3000
+			},
+			xaxis: {
+				show: false
+			}
+		});
+		function update() {
+			plot.setData([totalpwhistory]);
+            plot.setupGrid();
+			// Since the axes don't change, we don't need to call plot.setupGrid()
+			plot.draw();
+			setTimeout(update, updateInterval);
+		}
+		update();
+		// Add the Flot version string to the footer
+		//$("#footer").prepend("Flot " + $.plot.version + " &ndash; ");
+	});
+        
+        
+        
+    function arrayMin(arr) {
+  var len = arr.length, min = Infinity;
+  while (len--) {
+    if (arr[len] < min) {
+      min = arr[len];
+    }
+  }
+  return min;
+};
+
+function arrayMax(arr) {
+  var len = arr.length, max = -Infinity;
+  while (len--) {
+    if (arr[len] > max) {
+      max = arr[len];
+    }
+  }
+  return max;
+};    
+        
+    </script>  
+    
+    
+    
+    
+    
+    <script>
+        function toggleConn(id,id2) {
+            if (id.innerHTML === "Connected"){
+                id.innerHTML = "Disconnected";
+                id.style.color = "red";
+                id2.style.backgroundColor ="green";
+                id2.innerHTML = "Press to Connect";
+            }
+            else{
+                id.innerHTML = "Connected";
+                id.style.color = "green";
+                id2.style.backgroundColor ="red";
+                id2.innerHTML = "Press to Disconnect";
+            }
+        }
+    </script>
+    
+    
+    
+    
+    
+    <script>
+        function conndisconn(id) {
+            $('#concontrol').addClass("disabled");
+            if (id.innerHTML === "Connected"){
+                forced = true;
+                MQTTdisconnect();
+                forced = false;
+            }
+            else {
+                if (!mqtt){
+                MQTTconnect();}
+            }
+            $('#concontrol').removeClass("disabled");
+        }
+    </script>
+    
+    
+    
+    
+    
+    
+    <script>
+    	
+	</script>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <div class="container-fluid">
+        
+        <div class="row">
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+            
+                <div id="latest_topic" style="white-space: nowrap;">
+                
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+            
+                <div id="latest_msg" style="float:right;white-space:nowrap;">
+                
+                </div>
+            </div>
+        
+        </div>
+             
+        
+        
+        <div class="row">
+            
+            
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <center>
+                <button id="concontrol" type="button" class="btn btn-default" style="width:50%;background-color:green" onclick="conndisconn(connLabel)">Press to Connect</button></center>
+            </div>
+            
+           
+            
+            
+        
+        
+        </div>
+        
+        
+        <div class="row">
+               <div>Subscribed to <input type='text' id='topic' size="25%" disabled /> Status: <input type='text' id='status' size="25%" disabled /></div>
+        </div>
+        
+        
+        
+        <div class="row">
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                <div id="TLIST" style="font-size:10px;white-space: nowrap;">
+                
+                </div>
+            </div>
+            
+            
+            
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                <div id="VLIST" style="font-size:10px;white-space: nowrap;">
+                
+                </div>
+            
+            </div>
+            
+            
+        
+        
+        </div>
+        
+        <div class = "row">
+        <div class="demo-container">
+			<div id="placeholder" class="demo-placeholder" style="height:300px"></div>
+		</div>
+
+		      <p>You can update a chart periodically to get a real-time effect by using a timer to insert the new data in the plot and redraw it.</p>
+
+		      <p>Time between updates: <input id="updateInterval" type="text" value="" style="text-align: right; width:5em"> milliseconds</p>
+        </div>
+        
+        
+        
+        <div class = "row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <ul id='ws' style="font-family: 'Courier New', Courier, monospace;"></ul> 
+            </div>
+        </div>
+        
+        
+    </div>
+    
+    <!--
+Get outta here
+    
+    <script>
+        //alert("Hello, world.");
+        
+        // Function in variable
+        var add = function (a, b) {
+            return a + b;
+        };
+        
+        // Browser prompt
+        // var surname = prompt('Greetings friend, may I enquire as to your surname?'+add(10,4).toString());
+        
+        // Object
+        var jedi = {
+            name: "Yoda",
+            age: 899,
+            talk: function () { alert("another... Sky... walk..."); }
+        };
+        
+        /*
+        // Handler
+        var handleMouseover = function (event) {
+            document.getElementById('changable').innerHTML.text = " ALLAKS!!";
+            
+        };
+        var button = document.getElementById('ekei').onmouseover = changetext(this);
+        button.addEventListener('click', handleMouseover);
+        */
+        function changetext(id) {
+            if (id.innerHTML === "XIXO"){
+                id.innerHTML = "Tha allaksei???";
+            }
+            else{
+                id.innerHTML = "XIXO";
+            }
+            
+        }
+    </script>
+    
+    <dev id="edw">
+        <a href="nope.html" onclick="alert('Noooooo!');">Click</a>
+    
+    </dev>
+    
+     <dev id="ekei"  onmouseover="changetext(changable)">
+        Mouseover Here
+    
+    </dev>
+    
+         <dev id="changable">
+            Tha allaksei?
+             
+             
+             
+        </dev>
+    
+
+    
+    <dev>
+        <p>
+        <div class="btn-group btn-group-justified" role="group" aria-label="...">
+            <div class="btn-group" role="group">
+                <button type="button" class="btn btn-default">Left</button>
+            </div>
+     
+        </div>
+        
+        
+        
+        </p>
+        
+        
+        
+        
+        
+        
+    <p>
+    
+    -->
+   
+    
+   <!-- 
+    
+    </p>
+    <p>
+    <div>Subscribed to <input type='text' id='topic' disabled />
+        Status: <input type='text' id='status' size="80" disabled /></div>
+
+        <ul id='ws' style="font-family: 'Courier New', Courier, monospace;"></ul>    
+    </p>
+    </dev>
+
+-->
+    
+    
+    </body>
+
+<!--
+By ID
+document.getElementById is a method for getting hold of an element - unsurprisingly - by its ID.
+
+By Tag Name
+document.getElementsByTagName works in much the same way as getElementById, except that it takes a tag name (a, ul, li, etc) instead of an ID and returns a NodeList, which is essentially an array of the DOM Elements.
+
+By Class Name
+document.getElementsByClassName returns the same kind of NodeList as getElementsByTagName, except that you pass a class name to be matched, not a tag name.
+
+By CSS Selector
+A couple of new methods are available in modern browsers that make selecting elements easier by allowing the use of CSS selectors. They are document.querySelector and document.querySelectorAll.
+
+
+-->
+</html>

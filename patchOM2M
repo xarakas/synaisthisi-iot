@@ -1,0 +1,22 @@
+diff --git a/org.eclipse.om2m.site.in-cse/om2m.product b/org.eclipse.om2m.site.in-cse/om2m.product
+index 919cde6..db9e72d 100644
+--- a/org.eclipse.om2m.site.in-cse/om2m.product
++++ b/org.eclipse.om2m.site.in-cse/om2m.product
+@@ -52,7 +52,7 @@
+       <plugin id="org.eclipse.jetty.server"/>
+       <plugin id="org.eclipse.jetty.servlet"/>
+       <plugin id="org.eclipse.jetty.util"/>
+-      <plugin id="org.eclipse.om2m.binding.coap"/>
++      <plugin id="org.eclipse.om2m.binding.mqtt"/>
+       <plugin id="org.eclipse.om2m.binding.http"/>
+       <plugin id="org.eclipse.om2m.binding.service"/>
+       <plugin id="org.eclipse.om2m.commons"/>
+@@ -94,7 +94,7 @@
+       <plugin id="org.eclipse.equinox.ds" autoStart="true" startLevel="1" />
+       <plugin id="org.eclipse.equinox.event" autoStart="true" startLevel="1" />
+       <plugin id="org.eclipse.equinox.http.jetty" autoStart="true" startLevel="1" />
+-      <plugin id="org.eclipse.om2m.binding.coap" autoStart="true" startLevel="2" />
++      <plugin id="org.eclipse.om2m.binding.mqtt" autoStart="true" startLevel="2" />
+       <plugin id="org.eclipse.om2m.binding.http" autoStart="true" startLevel="2" />
+       <plugin id="org.eclipse.om2m.core" autoStart="true" startLevel="3" />
+       <plugin id="org.eclipse.om2m.das.testsuite" autoStart="false" startLevel="6" />
