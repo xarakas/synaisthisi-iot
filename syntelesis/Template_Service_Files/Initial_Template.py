@@ -88,7 +88,6 @@ def on_connect(client, userdata, flags, rc):
         sys.exit("Bad connection, returned code={0}".format(rc))
 
 
-#sys.exit('FUCK_OFF')
 
 client= paho.Client("client-mass") #create client object client1.on_publish = on_publish #assign function to callback client1.connect(broker,port) #establish connection client1.publish("house/bulb1","on")
 
