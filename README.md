@@ -6,20 +6,14 @@
 Not to worry though! We have prepared a quick and easy guide on how to do it on your own:
 
 
->Before going into the guide, you should have **Docker** installed on your machine. If you haven't,  [*here's*][2] *Docker*'s official documentation page, where you'll find anything you might need.
+>Before going into the guide, you should have **Docker**  and docker compose installed on your machine. If you haven't,  [*here's*][2] *Docker*'s official documentation page, where you'll find anything you might need.
 
 ## *The Guide:*
 After installing **Docker** open a *Terminal* and run the following commands:
 
-
-    1.      git clone https://<your_username>@bitbucket.org/xarakas/synaisthisi-container-dev.git 
-            (Be sure to replace your bitbucket username.)
-    2.      cd synaisthisi-container
-    3.      sudo docker build --no-cache --rm=true --tag synaisthisi . 
-            (Be sure to notice the last period! Do not remove it, it's required.)
-    4.      sudo docker create -t --publish 8083:8083 --publish 3000:3000 --publish 8080:8080 --publish 9001:9001 --publish 5000:5000 --publish 5432:5432 --publish 1883:1883  --publish 1885:1885 --publish 15672:15672 --publish 80:80 --publish 5672:5672 --publish 5683:5683/udp -v /var/run/docker.sock:/var/run/docker.sock -v <folder on host>:/myfolder --name cont1 synaisthisi 
-            (Be sure to replace <folder on host> with a folder on your machine that will be accesible from the container, in order to easily share your files.)
-    5.     sudo docker start cont1 
+1.      cd docker_compose
+2.      sudo docker-compose build
+3.      sudo docker-compose up
 
 Ports:
 3000: HTTP/REST/MQTT-Websockets
@@ -28,11 +22,11 @@ Ports:
 
 5672: AMQP
 
-5683: CoAP
+5683/UDP: CoAP
 
-8083: tomcat8
+8083: tomcat8 [(link)][7]
 
-8080: oM2M
+8080: oM2M [(link)][8] [(more info)][9]
 
 15672: RabbitMQ
 
@@ -43,23 +37,23 @@ Ports:
 
  To access the container through a terminal that executes on the virtualized environment:
 
->     sudo docker exec -ti cont1 bash
+>     sudo docker exec -ti docker_compose_flask_1 /bin/sh
 
  and... 
 
->     exit
+>     exit()
 
  when you need to exit the virtualized environment.
 
  **Additional commands that could come in handy...**
 
- Stop the container from running:
+ Stop the containers from running:
 
->     sudo docker stop cont1
+>     Ctrl+c
 
  Remove the container (**Warning!** Requires repetition of step 9 in order to run it again, and all data of the container will be deleted, i.e. user accounts, registered topics and services, etc.):
 
->     sudo docker rm cont1
+>     sudo docker-compose down
 
 ...and that concludes the guide.
 
@@ -87,9 +81,12 @@ GET -> curl -H "username:<your username>" -H "password:<your password>" http://l
 PUT -> curl -X PUT -H "username:<your username>" -H "password:<your password>" -d '<your message>' http://localhost:3000/resources/<your topic>
 
 
-[1]: https://bitbucket.org/xarakas/syntelesis/raw/8e432c309c180daa0fb5a049928808dadf245075/syndelesis/ClientAppSyndelesis/dist/assets/synaisthisi_anim.gif "SYNAISTHISI gif"
+[1]: https://bitbucket.org/synaisthisiusers/synaisthisi-container-users/raw/4886e419b9289dfed5f692029e51d2144787f906/docker_compose/flask_app/syndelesis/ClientAppSyndelesis/dist/assets/synaisthisi_anim.gif "SYNAISTHISI gif"
 [2]: https://docs.docker.com/ "Docker documentation"
 [3]: http://localhost/ "localhost"
 [4]: https://mosquitto.org/ "mosquitto"
 [5]: https://www.npmjs.com/package/mqtt-cli "mqtt-cli"
 [6]: https://github.com/mcollina/coap-cli "coap-cli"
+[7]: http://localhost:8083/rdf4j-workbench/ "rdf4j-endpoint"
+[8]: http://localhost:8080/webpage/welcome/index.html?context=/~&cseId=in-cse "OM2M-endpoint"
+[9]: https://wiki.eclipse.org/OM2M/one/MQTT_Binding "oneM2M/MQTT binding info"

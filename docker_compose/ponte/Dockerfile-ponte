@@ -1,0 +1,20 @@
+FROM alpine:3.7
+
+RUN apk add --no-cache logrotate sudo iputils curl nmap bash gcc krb5-dev nodejs nodejs python make g++ zeromq-dev  
+# musl-dev pkgconfig alpine-sdk libsodium-dev
+
+ENV LANG en_US.UTF-8
+
+# USER root
+
+RUN npm install bunyan ponte request -g --unsafe-perm=true --allow-root
+
+COPY config.js /config.js
+
+EXPOSE 3000
+EXPOSE 1883
+EXPOSE 5683
+
+RUN npm install bunyan  request --unsafe-perm=true --allow-root
+
+CMD ponte -v -c /config.js | bunyan

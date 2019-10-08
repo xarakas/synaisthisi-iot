@@ -1,0 +1,9 @@
+version: '3.2'
+  
+services:
+  om2m:
+    image: test-om2m
+    build:
+      context: .
+      dockerfile: Dockerfile-om2m
+

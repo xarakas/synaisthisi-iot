@@ -1,0 +1,35 @@
+import requests
+import json
+
+query = 'PREFIX sm:<http://127.0.0.1/ontology/ServiceModel.owl#> SELECT DISTINCT ?service WHERE { ?service rdfs:subClassOf sm:Service . }' 
+url = "http://localhost:8083/rdf4j-server/repositories/1"
+params = { 'query': query }
+headers = { 
+  'content-type': 'application/x-www-form-urlencoded', 
+  'accept': 'application/sparql-results+json' 
+}
+
+
+try:
+    r = requests.post(url, data=params, headers=headers, timeout=0.5)
+    if r.ok:
+        json = r.json()
+        heads = json['head']['vars']
+        for b in heads:
+            for a in json['results']['bindings']:
+                if '#' in a[b]['value']:
+                    print(a[b]['value'].split('#')[1])
+                else:
+                    print(a[b]['value'])
+    else:
+        # r.raise_for_status()
+        print('ERROR Calling rdf4j')
+except requests.ConnectionError as ex:
+    print('Connection Error')
+except requests.Timeout as ex:
+    print('Our request is taking too long...')
+except ValueError as ex: # json() error
+    print(ex)
+except Exception as ex:
+    print('Exception: ', ex)
+

@@ -1,0 +1,3 @@
+org.eclipse.om2m.mqtt.ip=rabbitmq
+org.eclipse.om2m.mqtt.port=1885
+org.eclipse.om2m.mqtt.timeout=20

@@ -1,0 +1,22 @@
+FROM alpine:3.7
+
+RUN apk add --no-cache sudo vim curl nmap bash logrotate unzip curl openjdk8-jre openjdk8 maven iputils git
+
+WORKDIR /
+RUN git clone http://git.eclipse.org/gitroot/om2m/org.eclipse.om2m.git
+
+WORKDIR org.eclipse.om2m
+# Edw gia extra configs
+ADD ./patchOM2M patch
+RUN git apply --whitespace=fix patch
+
+RUN mvn clean install -U -DskipTests=True
+
+ADD ./config.patch config.patch
+RUN cat config.patch >> org.eclipse.om2m.site.in-cse/target/products/in-cse/linux/gtk/x86_64/configuration/config.ini
+
+EXPOSE 8080
+
+WORKDIR org.eclipse.om2m.site.in-cse/target/products/in-cse/linux/gtk/x86_64/
+CMD sh start.sh
+

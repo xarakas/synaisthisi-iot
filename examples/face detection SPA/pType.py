@@ -7,45 +7,86 @@ to the output topic
 
 Created by Akis Giannoukos
 '''
-import sys
 import argparse
 import cv2
 import numpy as np
 
-try:
-	import paho.mqtt.client as paho
-except Exception as ex:
-	sys.exit('Paho library is not present')
+import time
+import sys
+import os
+import logging
+from logging.handlers import TimedRotatingFileHandler
+from pathlib import Path
 
-broker = "localhost"
+##
+##  Do not change!
+##  \/\/\/\/\/\/\/\/
+def setup_logger(name, log_file, level=logging.INFO):
+	formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
+	handler = TimedRotatingFileHandler(log_file)        
+	handler.setFormatter(formatter)
+	logger = logging.getLogger(name)
+	logger.setLevel(level)
+	logger.addHandler(handler)
+	return logger
 
-# File for the Computer Vision Classifier
-cascPath = "/myfolder/haarcascade_frontalface_default.xml"
+
+
+BASE_NAME = Path(__file__).resolve()
+DIR_NAME = BASE_NAME.parent
+SERVICE_FILE_NAME = BASE_NAME.name
+
+
+logger_name = SERVICE_FILE_NAME.split('.')[0] + '.log'
+logger_fqn = (DIR_NAME/'log'/logger_name).absolute().as_posix()
+logger = setup_logger(SERVICE_FILE_NAME, logger_fqn, logging.DEBUG)
+
+
+# logger = logging.getLogger(logger_name)
+# file_handler = logging.FileHandler(logger_fqn)
+# formatter    = logging.Formatter('%(asctime)s : %(levelname)s : %(name)s : %(message)s')
+# file_handler.setFormatter(formatter)
+# logger.addHandler(file_handler)
+
+logger.info('Synaisthisi ok Service just started for service: {0}.'.format(SERVICE_FILE_NAME))
+
+cascPath = "./haarcascade_frontalface_default.xml"
 faceCascade = cv2.CascadeClassifier(cascPath)
 
 # Variable used to keep track of the changes in the number of faces
 previous_no_of_faces = 0
 
 
-# Service Arguments
-parser = argparse.ArgumentParser(description='Collect arguments')
-# System provide params
-parser.add_argument("--username", metavar='username(text)', help="Please provide username")
-parser.add_argument("--input_topics", nargs='*', metavar='Input_topic', help='MQTT Broker Input Topics')
-parser.add_argument("--output_topics", nargs='*', metavar='Output_topic',help='MQTT Broker Output Topics')
+try:
+    import paho.mqtt.client as paho
+except Exception as ex:
+    logger.error('Paho library is not present')
+    sys.exit('Paho library is not present')
 
-# User (GUI) provided params
-parser.add_argument("--p", metavar='password(text)', help="Please provide password")
+paho.logging
 
-args = parser.parse_args()
-username=args.username
-in_topics = args.input_topics
-out_topics = args.output_topics
-user_password=args.p
+BROKER = os.environ.get('BROKER', '')
+CLIENT_NAME = os.environ.get('CLIENT_NAME', '')
+username = os.environ.get('username', '')
+user_password = os.environ.get('password', '')
+## 
+##  /\ /\ /\ /\ /\ /\ /\ /\
+## 
 
-# Developer should take care to parse as many input/output topics as created in web app
-in_topic = in_topics[0]
-out_topic = out_topics[0]
+
+
+##
+##  Add your TOPICS here
+##  \/\/\/\/\/\/\/\/
+in_topic = os.environ.get('in_topic_1', '')
+out_topic = os.environ.get('out_topic_1', '')
+
+
+
+logger.info('Credentials: {0}:{1}'.format(username, user_password))
+logger.info('BROKER: {0}'.format(BROKER))
+logger.info('in_topic_1: {0}'.format(in_topic))
+logger.info('in_topic_1: {0}'.format(out_topic))
 
 # Function that performs the face detection process
 def detect_faces(msg):
@@ -92,37 +133,37 @@ def on_message(client, userdata, message):
 
 # Log callback
 def on_log(client, userdata, level, buf):
-	print("log: ", buf)
+	logger.info("log: {0}".format(buf))
 
 # Callback to define what to happen when disconnecting
 def on_disconnect(client, userdata, flags, rc=0):
-	print("DisConnected flags {0}, result code:{1}, client_id: {2} ".format(flags, rc, client._client_id))
+	logger.info("DisConnected flags {0}, result code:{1}, client_id: {2} ".format(flags, rc, client._client_id))
 
 # Callback to define what to happen when connecting
 def on_connect(client, userdata, flags, rc):
 	if(rc==0):
-		print("connecting to broker ", broker)
-		print("subscribing to topics ")
+		logger.info("connecting to broker {0}".format(BROKER))
+		logger.info("Subscribing to (input) topics")
 
 		# Subscribe to all the input topics that we want to use
 		client.subscribe(in_topic)
 
 	elif(rc==3):
-		print("server unavailable")
+		logger.error("server unavailable")
 		client.loop_stop()
 		sys.exit("Server is unavailable, please try later")
 	elif(rc==5):
-		print("Invalid Credentials")
+		logger.error("Invalid Credentials")
 		client.loop_stop()
 		sys.exit(5)
 	else:
-		print("Bad connection, returned code=",rc)
+		logger.error("Bad connection, returned code={0}".format(rc))
 		client.loop_stop()
 		sys.exit("Bad connection, returned code={0}".format(rc))
 
 
 # Create client object
-client = paho.Client("P-type")
+client = paho.Client(CLIENT_NAME)
 client.username_pw_set(username, user_password)
 
 # Callback to handle subscription topics incoming messages
@@ -136,9 +177,9 @@ client.on_disconnect=on_disconnect
 
 # Try to connect to the client
 try:
-	client.connect(broker)
+	client.connect(BROKER)
 except:
-	print("Error connecting")
+	logger.error("Error connecting")
 	sys.exit(7)
 
 # Start the mqtt loop and iterate forever

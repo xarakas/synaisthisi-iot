@@ -1,0 +1,7 @@
+# Dockerfile-postgres
+
+FROM postgres:latest
+
+# Nginx will listen on this port
+EXPOSE 5432
+

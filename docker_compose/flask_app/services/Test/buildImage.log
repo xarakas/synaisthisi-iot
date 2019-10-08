@@ -1,0 +1,13 @@
+2019-01-18 13:01:12,789 INFO:Synaisthisi Service started for service: 8.py.
+2019-01-18 13:01:12,816 INFO:Client client-mass, sending userdata: None, buf: Sending CONNECT (u1, p1, wr0, wq0, wf0, c1, k60) client_id=b'client-mass'
+2019-01-18 13:01:12,828 INFO:Client client-mass, sending userdata: None, buf: Received CONNACK (0, 0)
+2019-01-18 13:01:12,828 INFO:connecting to broker localhost
+2019-01-18 13:01:12,829 INFO:Subscribing to (input) topics
+2019-01-18 13:01:12,829 INFO:Client client-mass, sending userdata: None, buf: Sending SUBSCRIBE (d0) [(b'topic1', 0)]
+2019-01-18 13:01:12,829 INFO:Client client-mass, sending userdata: None, buf: Sending SUBSCRIBE (d0) [(b'topic5', 0)]
+2019-01-18 13:01:12,829 INFO:Client client-mass, sending userdata: None, buf: Sending SUBSCRIBE (d0) [(b'/b84895a0-d25f-4aee-93b1-d80452204595', 0)]
+2019-01-18 13:01:12,829 INFO:Client client-mass, sending userdata: None, buf: Sending SUBSCRIBE (d0) [(b'disconnect', 0)]
+2019-01-18 13:01:12,830 INFO:Client client-mass, sending userdata: None, buf: Received SUBACK
+2019-01-18 13:01:12,830 INFO:Client client-mass, sending userdata: None, buf: Received SUBACK
+2019-01-18 13:01:12,871 INFO:Client client-mass, sending userdata: None, buf: Received SUBACK
+2019-01-18 13:01:12,872 INFO:Client client-mass, sending userdata: None, buf: Received SUBACK

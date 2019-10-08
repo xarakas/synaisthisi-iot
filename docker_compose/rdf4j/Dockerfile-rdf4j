@@ -1,0 +1,23 @@
+# Dockerfile-rdf4j
+
+FROM tomcat:latest
+
+EXPOSE 8083
+
+WORKDIR /
+ADD ./ontology ontology
+
+#change port configuration
+RUN sed -i '69s@.*@    <Connector port="8083" protocol="HTTP/1.1"@' /usr/local/tomcat/conf/server.xml 
+RUN wget http://ftp.osuosl.org/pub/eclipse/rdf4j/eclipse-rdf4j-2.5.0-sdk.zip
+RUN unzip eclipse-rdf4j-2.5.0-sdk.zip
+RUN cp eclipse-rdf4j-2.5.0/war/* /usr/local/tomcat/webapps/
+RUN mkdir -p /root/.RDF4J/server/logs
+#RUN chown -R tomcat8:tomcat8 /usr/share/tomcat8/
+
+RUN mkdir /root/.RDF4J/server/repositories/
+RUN mkdir /root/.RDF4J/server/repositories/1/
+RUN cp -r /ontology/* /root/.RDF4J/server/repositories/1/
+#RUN chown -R tomcat8:tomcat8 /root/.RDF4J/server/repositories/
+
+#RUN service tomcat8 start

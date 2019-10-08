@@ -1,0 +1,2 @@
+2018-12-13 12:46:59,839 INFO:Synaisthisi Service started for service: 7.py.
+2018-12-13 12:46:59,905 ERROR:list index out of range. Possibly the number of input/output topics in your service file are not in accordance with these created in "Services" portal section.
