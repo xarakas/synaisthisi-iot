@@ -5,6 +5,7 @@ import logging
 from logging.handlers import TimedRotatingFileHandler
 from pathlib import Path
 
+
 ##
 ##  Do not change!
 ##  \/\/\/\/\/\/\/\/
@@ -33,8 +34,8 @@ except Exception as ex:
     sys.exit('Paho library is not present')
 
 paho.logging
-
 BROKER = os.environ.get('BROKER', 'localhost')
+CLIENT_NAME = os.environ.get('CLIENT_NAME', '')
 username = os.environ.get('username', '')
 password = os.environ.get('password', '')
 ## 
@@ -53,13 +54,12 @@ out_topic_1 = os.environ.get('out_topic_1', '')
 out_topic_2 = os.environ.get('out_topic_2', '')
 
 
-logger.info(f'Credentials: {username}:{password}')
-logger.info(f'BROKER: {BROKER}')
-logger.info(f'in_topic_1: {in_topic_1}')
-logger.info(f'in_topic_2: {in_topic_2}')
-logger.info(f'in_topic_3: {in_topic_3}')
-logger.info(f'in_topic_1: {out_topic_1}')
-logger.info(f'in_topic_2: {out_topic_2}')
+# logger.info(f'Credentials: {username}:{password}')
+# logger.info(f'in_topic_1: {in_topic_1}')
+# logger.info(f'in_topic_2: {in_topic_2}')
+# logger.info(f'in_topic_3: {in_topic_3}')
+# logger.info(f'in_topic_1: {out_topic_1}')
+# logger.info(f'in_topic_2: {out_topic_2}')
 
 
 ##
@@ -78,10 +78,11 @@ def on_message(client, userdata, message):
         logger.info('IN RCV TOPIC 2')
         client.publish(out_topic_2, "Received in topic {0}, Publishing in topic {1}, message => {2}".format(in_topic_2, out_topic_2, r_msg))
     if(message.topic==in_topic_3):
+        logger.info('IN RCV TOPIC 3')
         client.publish(out_topic_2, "Received in topic {0}, Publishing in topic {1}, message => {2}".format(in_topic_3, out_topic_2, r_msg))
-    if(message.topic=="disconnect"):
-        client.disconnect()
-        client.loop_stop()
+    # if(message.topic=="disconnect"):
+    #     client.disconnect()
+    #     client.loop_stop()
 
 ##
 ## Write logs
@@ -93,7 +94,7 @@ def on_log(client, userdata, level, buf):
 ## What to do when the service is disconnected from the platform's broker
 ##
 def on_disconnect(client, userdata, flags, rc=0):
-    logger.info('Disconnected, client: {0} and flags: {1}'.format(client._client_id, flags))
+    logger.info('Disconnected, client: {0}'.format(client._client_id))
     sys.exit('Disconnected, client: {0}'.format(client._client_id))
 
 ##
@@ -101,6 +102,7 @@ def on_disconnect(client, userdata, flags, rc=0):
 ##
 def on_connect(client, userdata, flags, rc):
     logger.info(f'Conencting ... with : {username}:{password}')
+
     if(rc==0):
         logger.info("connecting to broker {0}".format(BROKER))
         logger.info("Subscribing to (input) topics")
@@ -110,10 +112,10 @@ def on_connect(client, userdata, flags, rc):
         client.subscribe(in_topic_1)
         client.subscribe(in_topic_2)
         client.subscribe(in_topic_3)
+        # client.subscribe("disconnect")
         ## 
         ##  /\ /\ /\ /\ /\ /\ /\ /\
         ## 
-        client.subscribe("disconnect")
     elif(rc==3):
         logger.error("server unavailable")
         client.loop_stop()
@@ -129,7 +131,7 @@ def on_connect(client, userdata, flags, rc):
 
 
 
-client= paho.Client("client-service") 
+client= paho.Client(CLIENT_NAME) 
 client.username_pw_set(username, password)
 
 ###### CALLBACKS
@@ -152,4 +154,9 @@ except Exception as ex:
     logger.error('Error connecting to broker, error: {0}'.format(ex))
     sys.exit('Error connecting to broker')
 
+
+#client.loop_start() #start loop to process received messages
 client.loop_forever()
+
+# client.disconnect() #disconnect
+# client.loop_stop() #stop loop
