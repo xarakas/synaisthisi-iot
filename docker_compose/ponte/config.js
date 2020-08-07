@@ -44,7 +44,7 @@ module.exports = {
       else {username = mydata}
       if (!mydatap){password = ''}
       else {password = mydatap}
-      log.info("Authenticate CoAP called -- URL: " + req.url + " User: "+username+ " Password: "+password )
+      log.info("Authenticate CoAP called -- URL: " + req.url + " User: "+username )
       
       var headers = {
             'User-Agent':       'PonteBroker/0.0.1',
@@ -52,8 +52,9 @@ module.exports = {
         }
 
         // Configure the request
+        // sevangelou - change to https
         var options = {
-            url: `http://${FLASK_APP}:${FLASK_PORT}/mqtt/auth`,
+            url: `https://${FLASK_APP}/mqtt/devtoken/auth`,
             method: 'POST',
             headers: headers,
             form: {'username': username, 'password': password}
@@ -96,7 +97,7 @@ module.exports = {
         }
         // Configure the request
         var options = {
-            url: `http://${FLASK_APP}:${FLASK_PORT}/mqtt/acl`,
+            url: `https://${FLASK_APP}/mqtt/acl`,
             method: 'POST',
             headers: headers,
             form: {'username': username, 'topic': topic, 'acc': 1}
@@ -141,7 +142,7 @@ module.exports = {
 
         // Configure the request
         var options = {
-            url: `http://${FLASK_APP}:${FLASK_PORT}/mqtt/acl`,
+            url: `https://${FLASK_APP}/mqtt/acl`,
             method: 'POST',
             headers: headers,
             form: {'username': username, 'topic': topic, 'acc': 2}
@@ -177,37 +178,37 @@ module.exports = {
       else {username = req.headers.username}
       if (!req.headers.password){password = ''}
       else {password = req.headers.password}
-      log.info("Authenticate HTTP called -- URL: " + req.url + " User: "+username+ " Password: "+password )
+      log.info("Authenticate HTTP called -- URL: " + req.url + " User: "+username )
 
       var headers = {
-            'User-Agent':       'PonteBroker/0.0.1',
-            'Content-Type':     'application/x-www-form-urlencoded'
-        }
+          'User-Agent':       'PonteBroker/0.0.1',
+          'Content-Type':     'application/x-www-form-urlencoded'
+      }
 
-        // Configure the request
-        var options = {
-            url: `http://${FLASK_APP}:${FLASK_PORT}/mqtt/auth`,
-            method: 'POST',
-            headers: headers,
-            form: {'username': username, 'password': password}
-        }
+      // Configure the request
+      var options = {
+          url: `https://${FLASK_APP}/mqtt/devtoken/auth`,
+          method: 'POST',
+          headers: headers,
+          form: {'username': username, 'password': password}
+      }
 
-        // Start the request
-        request(options, function (error, response, body) {
-           if(typeof(response) != "undefined"){
-            log.info("Portal response status code: " + response.statusCode)
-            if (!error && response.statusCode == 200) {
-                callback(null, true, { username: username } );
-            }
-            else if (error) {
-                 callback(error);
-            }
-            else 
-            {
-                 callback(null, false);
-            }
+      // Start the request
+      request(options, function (error, response, body) {
+          if(typeof(response) != "undefined"){
+          log.info("Portal response status code: " + response.statusCode)
+          if (!error && response.statusCode == 200) {
+              callback(null, true, { username: username } );
           }
-        });
+          else if (error) {
+                callback(error);
+          }
+          else 
+          {
+                callback(null, false);
+          }
+        }
+      });
     },
     /**
      * @param {Object} subject The subject returned by the authenticate function
@@ -226,7 +227,7 @@ module.exports = {
         }
         // Configure the request
         var options = {
-            url: `http://${FLASK_APP}:${FLASK_PORT}/mqtt/acl`,
+            url: `https://${FLASK_APP}/mqtt/acl`,
             method: 'POST',
             headers: headers,
             form: {'username': username, 'topic': topic, 'acc': 1}
@@ -265,7 +266,7 @@ module.exports = {
         }
         // Configure the request
         var options = {
-            url: `http://${FLASK_APP}:${FLASK_PORT}/mqtt/acl`,
+            url: `https://${FLASK_APP}/mqtt/acl`,
             method: 'POST',
             headers: headers,
             form: {'username': username, 'topic': topic, 'acc': 2}
@@ -290,12 +291,18 @@ module.exports = {
     }
   },
   mqtt: {
+    // sevangelou
+    // FOR MQTTS
+    // secure : {
+    //   keyPath:"/key.key",
+    //   certPath:"/cert.crt"
+    // },
     /**
      * @link https://github.com/mcollina/mosca/wiki/Authentication-&-Authorization
      */
     authenticate: function(client, username, password, callback) {
         // Set the headers
-        log.info("Authenticate MQTT called -- User: "+username+ " Password: "+password )
+        log.info("Authenticate MQTT called -- User: "+username)
         var headers = {
             'User-Agent':       'PonteBroker/0.0.1',
             'Content-Type':     'application/x-www-form-urlencoded'
@@ -303,15 +310,15 @@ module.exports = {
 
         // Configure the request
         var options = {
-            url: `http://${FLASK_APP}:${FLASK_PORT}/mqtt/auth`,
+            url: `https://${FLASK_APP}/mqtt/devtoken/auth`, // sevangelou - endpoints to https
             method: 'POST',
             headers: headers,
             form: {'username': username, 'password': password}
         }
-
+        process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0; // sevangelou - this is so self-signed certs are trusted, should be removed in prod
         // Start the request
         request(options, function (error, response, body) {
-           if(typeof(response) != "undefined"){
+          if(typeof(response) != "undefined"){
             log.info("Portal response status code: " + response.statusCode)
             if (!error && response.statusCode == 200) {
                 callback(null, true, { username: username } );
@@ -337,12 +344,12 @@ module.exports = {
 
         // Configure the request
         var options = {
-            url: `http://${FLASK_APP}:${FLASK_PORT}/mqtt/acl`,
+            url: `https://${FLASK_APP}/mqtt/acl`,
             method: 'POST',
             headers: headers,
             form: {'username': client.user, 'topic': topic, 'acc': 2}
         }
-
+        process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
         // Start the request
         request(options, function (error, response, body) {
            if(typeof(response) != "undefined"){
@@ -368,12 +375,13 @@ module.exports = {
         }
         // Configure the request
         var options = {
-	    url: `http://${FLASK_APP}:${FLASK_PORT}/mqtt/acl`,
+	    url: `https://${FLASK_APP}/mqtt/acl`,
             method: 'POST',
             headers: headers,
             form: {'username': client.user, 'topic': topic, 'acc': 1}
         }
         // Start the request
+        process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
         request(options, function (error, response, body) {
            if(typeof(response) != "undefined"){
             log.info("Portal response status code: " + response.statusCode)

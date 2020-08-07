@@ -10,8 +10,13 @@ ENV LANG en_US.UTF-8
 RUN npm install bunyan ponte request -g --unsafe-perm=true --allow-root
 
 COPY config.js /config.js
+# sevangelou - copy the private key
+COPY key.key /key.key 
+# sevangelou - copy the certificate
+COPY cert.crt /cert.crt
 
 EXPOSE 3000
+#EXPOSE 8883 # sevangelou - in case of mqtts
 EXPOSE 1883
 EXPOSE 5683
 

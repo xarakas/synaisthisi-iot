@@ -1,0 +1,547 @@
+
+<!-- sevangelou - change endpoints to https requests -->
+
+<script type="text/javascript">
+    RED.nodes.registerType('synaisthisi-service',{
+        category: 'common',
+        defaults: {
+            name: {value:""},
+            //username: {value:"", exportable: true},
+            ip: {value:""},
+            username: {value:""},
+            password: {value:""},
+            user_id: {value: ""},
+            access_token: {value: ""},
+            service_id: {value: ""},
+            description: {value: ""},
+            location: {value: ""},
+            deploy_new: {value: ""},
+            new_s_name: {value: ""},
+            service_type: {value: ""},
+            service_ontology: {value: ""},
+            docker_image_built: {value: ""},
+            docker_container_running: {value: ""},
+            topics: {},
+
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: "zoom_out_map.png",
+        label: function() {
+            return this.name||"synaisthisi-service";
+        }
+     });
+</script>
+
+
+<script type="text/javascript">
+    var access_token_mine="N/A";
+    var user_id;
+    var glob_resp;
+    var drop_downlist=[];
+    var all_topics = {input_topics: [], output_topics: []};
+    var s_name_id_map = new Object();
+    function login2(servicename_for_selection){
+        var musername = document.getElementById("node-input-username").value;
+        var mpassword = document.getElementById("node-input-password").value;
+        var mydata = "username="+musername+"&password="+mpassword;
+        const url = "https://"+document.getElementById("node-input-ip").value+"/login";
+        fetch(url, {
+            method : "POST",
+            body : mydata,
+            mode: "cors",
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded'
+            },
+        }).then(
+            response => response.text() // .json(), etc.
+        ).then( function(response){
+            glob_resp = JSON.parse(response);
+            access_token_mine = glob_resp["access_token"];
+            tempdata = glob_resp["data"];
+            user_id = tempdata["id"];
+            const myNodeId = document.getElementById("node-input-user_id");
+            myNodeId.value = user_id;
+            const myNodeAT = document.getElementById("node-input-access_token");
+            myNodeAT.value = access_token_mine;
+   
+            const url2 = "https://"+document.getElementById("node-input-ip").value+"/users/"+user_id+"/services";
+            fetch(url2, {
+                method : "GET",
+                mode: "cors",
+                headers: {
+                  'Authorization': 'Bearer ' + access_token_mine
+                },
+                     
+            }).then(
+                response => response.json() // .json(), etc.
+            // same as function(response) {return response.text();}
+            ).then( function(response){
+                    var mresponse = response;
+                    drop_downlist = [];
+                    for(var index in mresponse){
+                        drop_downlist.push(mresponse[index]["name"]);
+                        s_name_id_map[mresponse[index]["name"]]=mresponse[index]["id"];
+                    }
+                    
+                    try{
+                        document.getElementById("def_opt").outerHTML = "";
+                        }
+                    catch { 
+                        
+                    }
+                    var select = document.getElementById("s_list");
+                    while (select.firstChild) {
+                            select.removeChild(select.firstChild);
+
+                    }
+                    for (var i=0; i < drop_downlist.length; i++){
+                        var opt = drop_downlist[i];
+                        var el = document.createElement("option");
+                        el.textContent = opt;
+                        el.value = opt;
+                        select.appendChild(el);
+                    }
+                    if (servicename_for_selection!==""){
+                        document.getElementById("s_list").value = servicename_for_selection;
+                    }
+                    selectService2();
+            }
+            );
+
+
+
+
+            
+        }
+        );
+    }
+
+    function selectService2(){
+        var selected_s = document.getElementById( "s_list" );
+        var selected_s_id = get_service_id(selected_s.options[ selected_s.selectedIndex ].value);
+        const myNode3 = document.getElementById("node-input-service_id");
+        myNode3.value = selected_s_id;
+
+        if (typeof user_id === 'undefined' || typeof selected_s_id === 'undefined') {
+  // color is undefined
+            return;
+        }
+        else {
+            const url3 = "https://"+document.getElementById("node-input-ip").value+"/users/"+user_id+"/services/"+selected_s_id;
+            fetch(url3, {
+                method : "GET",
+                mode: "cors",
+                headers: {
+                //'Content-Type': 'application/json',
+                  'Authorization': 'Bearer ' + access_token_mine
+                },
+                     
+            }).then(
+                response => response.json() // .json(), etc.
+            // same as function(response) {return response.text();}
+            ).then( function(response){
+                 if(document.getElementById("node-input-deploy_new").checked){
+                    toggleNewDeploy2();
+                    return;
+                 }
+                const myNode6 = document.getElementById("in_topics");
+                while (myNode6.firstChild) {
+                        myNode6.removeChild(myNode6.firstChild);
+                }
+                const myNode26 = document.getElementById("out_topics");
+                while (myNode26.firstChild) {
+                        myNode26.removeChild(myNode26.firstChild);
+                }
+                    var description = response["description"];
+                    var location = response["location"];
+                    var ontology = response["service_ontology"];
+                    var type = response["service_type"];
+                    var image = response["service_image_built"];
+                    var container = response["service_is_running"];
+                    var input_t = response["input_topics"];
+                    var output_t = response["output_topics"];
+                    var mloc = document.getElementById("node-input-location");
+                    mloc.value = location;
+                    var mdes = document.getElementById("node-input-description");
+                    mdes.value = description;
+                    var mont = document.getElementById("node-input-service_ontology");
+                    mont.value = ontology;
+                    var mtyp = document.getElementById("node-input-service_type");
+                    mtyp.value = type;
+                    var mimage = document.getElementById("node-input-docker_image_built");
+                    mimage.value = image;
+                    docker_image_built = image;
+                    var mcont = document.getElementById("node-input-docker_container_running");
+                    mcont.value = container;
+                    docker_cont_status = container;
+                    input_t.forEach(function (arrayItem) {
+
+                        var div = document.createElement("input");
+                        var div2 = document.createElement("label");
+                        var div3 = document.createElement("topicOntology")
+                        div.type = "text";
+                        div2.innerHTML = arrayItem.description;
+                        div3.innerHTML = arrayItem.topic_ontology;
+                        div.value = arrayItem.name;
+                        div.disabled = true;
+
+                        document.getElementById("in_topics").appendChild(div);
+                        document.getElementById("in_topics").appendChild(div2);
+                        document.getElementById("in_topics").appendChild(div3);
+                    });
+                    output_t.forEach(function (arrayItem) {
+
+                        var div = document.createElement("input");
+                        var div2 = document.createElement("label");
+                        var div3 = document.createElement("topicOntology")
+                        div.type = "text";
+                        div2.innerHTML = arrayItem.description;
+                        div3.innerHTML = arrayItem.topic_ontology;
+                        div.value= arrayItem.name;
+                        div.disabled = true;
+
+                        document.getElementById("out_topics").appendChild(div);
+                        document.getElementById("out_topics").appendChild(div2);
+                        document.getElementById("out_topics").appendChild(div3);
+                    });
+                    var selected_s = document.getElementById( "s_list" );
+                    var selected_s_id = get_service_id(selected_s.options[ selected_s.selectedIndex ].value);
+                    var myNodeSID = document.getElementById("node-input-service_id");
+                    myNodeSID.value = selected_s_id;
+                    update_topics_JSON();
+                }
+            );
+            }
+    }
+
+
+    function toggleNewDeploy2(){
+        if(document.getElementById("node-input-deploy_new").checked){
+            var selected_s = document.getElementById( "s_list" );
+            var selected_s_id = get_service_id(selected_s.options[ selected_s.selectedIndex ].value);
+            const myNode4 = document.getElementById("node-input-service_id");
+            myNode4.value = selected_s_id;
+            var newname = document.getElementById("node-input-new_s_name");
+            newname.value = selected_s.options[ selected_s.selectedIndex ].value + "_" + document.getElementById("node-input-username").value;
+            document.getElementById("node-input-description").disabled  = false;
+            document.getElementById("node-input-location").disabled  = false;
+            document.getElementById("node-input-new_s_name").disabled  = false;
+            document.getElementById("node-create_new").disabled  = false;
+
+
+
+            const url5 = "https://"+document.getElementById("node-input-ip").value+"/users/"+user_id+"/services/"+selected_s_id;
+            fetch(url5, {
+                method : "GET",
+                mode: "cors",
+                headers: {
+                  'Authorization': 'Bearer ' + access_token_mine
+                },
+                     
+            }).then(
+                response => response.json() // .json(), etc.
+            // same as function(response) {return response.text();}
+            ).then( function(response){
+                const myNode = document.getElementById("in_topics");
+                while (myNode.firstChild) {
+                        myNode.removeChild(myNode.firstChild);
+                }
+                const myNode2 = document.getElementById("out_topics");
+                while (myNode2.firstChild) {
+                        myNode2.removeChild(myNode2.firstChild);
+                }
+                var description = response["description"];
+                var location = response["location"];
+                var input_t = response["input_topics"];
+                var output_t = response["output_topics"];
+                var mloc = document.getElementById("node-input-location");
+                mloc.value = location;
+                var mdes = document.getElementById("node-input-description");
+                mdes.value = description;
+                input_t.forEach(function (arrayItem) {
+
+                    var div = document.createElement("input");
+                    var div2 = document.createElement("label");
+                    var div3 = document.createElement("topicOntology");
+                    div.type = "text";
+                    div2.innerHTML = arrayItem.description;
+                    div3.innerHTML = arrayItem.topic_ontology;
+                    div.value = "";
+                    div.disabled = false;
+
+                    document.getElementById("in_topics").appendChild(div);
+                    document.getElementById("in_topics").appendChild(div2);
+                    document.getElementById("in_topics").appendChild(div3);
+                });
+                output_t.forEach(function (arrayItem) {
+
+                    var div = document.createElement("input");
+                    var div2 = document.createElement("label");
+                    var div3 = document.createElement("topicOntology");
+                    div.type = "text";
+                    div2.innerHTML = arrayItem.description;
+                    div3.innerHTML = arrayItem.topic_ontology;
+                    div.value= "";
+                    div.disabled = false;
+
+                    document.getElementById("out_topics").appendChild(div);
+                    document.getElementById("out_topics").appendChild(div2);
+                    document.getElementById("out_topics").appendChild(div3);
+                });
+                update_topics_JSON();
+                }
+            );
+            
+        }
+        else {
+            selectService2();
+            var newname = document.getElementById("node-input-new_s_name");
+            newname.value = "";
+            update_topics_JSON();
+            document.getElementById("node-input-description").disabled  = true;
+            document.getElementById("node-input-location").disabled  = true;
+            document.getElementById("node-input-new_s_name").disabled  = true;
+            document.getElementById("node-create_new").disabled  = true;
+            update_topics_JSON();
+        }
+    }
+
+    function get_service_id(name) {
+        try{
+            return s_name_id_map[name];
+        } catch(err){
+            return "-1";
+        }
+    }
+
+
+    function build_image() {
+        console.log("send request to build image");
+        var selected_s = document.getElementById( "s_list" );
+        var selected_s_id = get_service_id(selected_s.options[ selected_s.selectedIndex ].value);
+        const url7 = "https://"+document.getElementById("node-input-ip").value+"/users/"+user_id+"/services/"+selected_s_id+"/dockerImage";
+        fetch(url7, {
+                method : "POST",
+                body : "",
+                mode: "cors",
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': 'Bearer ' + access_token_mine
+                },
+            }).then(
+                response => response.json() // .json(), etc.
+            ).then( function(response){
+                alert(JSON.stringify(response));
+                selectService2();
+                }
+            );
+    }
+
+
+    function run_or_stop_container() {
+        console.log("send request to start or stop container")
+        var selected_s = document.getElementById( "s_list" );
+        var selected_s_id = get_service_id(selected_s.options[ selected_s.selectedIndex ].value);
+        const url7 = "https://"+document.getElementById("node-input-ip").value+"/users/"+user_id+"/services/"+selected_s_id+"/status";
+        var contrunning = document.getElementById("node-input-docker_container_running");
+        var user_pass = "--p "+document.getElementById("node-input-password").value;
+        if (contrunning.value==="false"){
+            fetch(url7, {
+                    method : "POST",
+                    body : JSON.stringify({
+                        serviceArgs: user_pass
+                    }),
+                    mode: "cors",
+                    headers: {
+                      'Content-Type': 'application/json',
+                      'Authorization': 'Bearer ' + access_token_mine
+                    },
+                }).then(
+                    response => response.json() // .json(), etc.
+                ).then( function(response){
+                    alert(JSON.stringify(response));
+                    selectService2();
+                    }
+                );
+        }
+        else{
+            fetch(url7, {
+                    method : "DELETE",
+                    body : "",
+                    mode: "cors",
+                    headers: {
+                      'Content-Type': 'application/json',
+                      'Authorization': 'Bearer ' + access_token_mine
+                    },
+                }).then(
+                    response => response.json() // .json(), etc.
+                ).then( function(response){
+                    alert(JSON.stringify(response));
+                    selectService2();
+                    }
+                );
+        }
+
+    }
+
+
+
+    function update_topics_JSON(){
+        all_topics = {input_topics: [], output_topics: []};
+        var searchEles = document.getElementById("in_topics").children;
+        for(var i = 0; i < searchEles.length; i=i+3) {
+            all_topics.input_topics.push({"name": searchEles[i].value, "description": searchEles[i+1].innerHTML, "topic_ontology": searchEles[i+2].innerHTML});
+        }        
+        var searchEles = document.getElementById("out_topics").children;
+        for(var i = 0; i < searchEles.length; i=i+3) {
+            all_topics.output_topics.push({"name": searchEles[i].value, "description": searchEles[i+1].innerHTML, "topic_ontology": searchEles[i+2].innerHTML});
+        }
+        var myNodeTJ = document.getElementById("node-input-topics");
+        myNodeTJ.value = JSON.stringify(all_topics);
+    }
+
+
+
+    function duplicate_service() {
+        if (!document.getElementById("node-input-deploy_new").checked){
+            console.log("nothing to do... Please check the checkbox!");
+            return;
+        }
+        // Request to duplicate new service
+        var selected_s = document.getElementById( "s_list" );
+        var selected_s_id = get_service_id(selected_s.options[ selected_s.selectedIndex ].value);
+        const url6 = "https://"+document.getElementById("node-input-ip").value+"/services/"+selected_s_id;
+            fetch(url6, {
+                method : "POST",
+                //body: new FormData(document.getElementById("inputform")),
+                // -- or --
+                body : JSON.stringify({
+                    name: document.getElementById("node-input-new_s_name").value,
+                    description: document.getElementById("node-input-description").value,
+                    service_type: document.getElementById("node-input-service_type").value,
+                    service_ontology: document.getElementById("node-input-service_ontology").value,
+                    location: document.getElementById("node-input-location").value,
+                    input_topics: all_topics["input_topics"],
+                    output_topics: all_topics["output_topics"]
+                }),
+                mode: "cors",
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': 'Bearer ' + access_token_mine
+                },
+                     
+            }).then(
+                response => response.json() // .json(), etc.            
+            ).then( function(response){
+                console.log(JSON.stringify(response));
+                alert(JSON.stringify(response));            
+                var newname = document.getElementById("node-input-new_s_name");        
+                document.getElementById("node-input-deploy_new").checked = false;
+                login2(newname.value);
+                
+                ////// select_ new service from list
+                alert("Service "+newname.value+" created!");                
+                toggleNewDeploy2();
+            
+            }
+            );
+
+        
+        
+        
+
+    }
+
+
+
+</script>
+
+
+<script type="text/x-red" data-template-name="synaisthisi-service">
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-ip"><i class="icon-tag"></i> Portal IP </label>
+        <input type="text" id="node-input-ip" placeholder="PortalIP" value="localhost">
+    </div>
+    <div class="form-row">
+         <label for="node-input-username"><i class="icon-tag"></i>Synaisthisi Username</label>
+         <input type="text" id="node-input-username">
+    </div>
+    <div class="form-row">
+         <label for="node-input-password"><i class="icon-tag"></i>Synaisthisi Password</label>
+         <input type="password" id="node-input-password">
+    </div>
+    <div class="form-row">
+         <input type="button" id="node-login" value="Login" onclick="login2('')">
+    </div>
+    <div class="form-row">
+        <label>User ID: </label> <input type="text" id="node-input-user_id" disabled>
+    </div>
+    <div class="form-row">
+        <label>Access token: </label> <input type="text" id="node-input-access_token" disabled>
+    </div>
+    <div class="form-row">
+        <select id="s_list" onchange="selectService2()">
+            <option id="def_opt" value="default">Please login to select a service..</option>        
+        </select>
+    </div>
+    <div class="form-row">
+        <label for="node-input-service_id">Service ID: </label> <input type="text" id="node-input-service_id" disabled>
+    </div>
+    <div class="form-row">
+        <label for="node-input-deploy_new"><i class="icon-tag"></i> Deploy new service </label>
+        <input type="checkbox" id="node-input-deploy_new" onchange="toggleNewDeploy2()">
+    </div>
+    <div class="form-row">
+        <label for="node-input-docker_image_built">Image built: </label> <input type="text" id="node-input-docker_image_built" disabled>
+        <input type="button" id="node-build" value="Build!" onclick="build_image()">
+    </div>
+    <div class="form-row">
+        <label for="node-input-docker_container_running">Container running: </label> <input type="text" id="node-input-docker_container_running" disabled>
+        <input type="button" id="node-toggle" value="Toggle!" onclick="run_or_stop_container()">
+    </div>
+    <div class="form-row">
+        <label for="node-input-description">Description: </label> <input type="text" id="node-input-description" disabled>
+    </div>
+    <div class="form-row">
+        <label for="node-input-location">Location: </label> <input type="text" id="node-input-location" disabled>
+    </div>
+    <div class="form-row">
+        <label for="node-input-service_ontology">Semantics: </label> <input type="text" id="node-input-service_ontology" disabled>
+    </div>
+    <div class="form-row">
+        <label for="node-input-service_type">Type: </label> <input type="text" id="node-input-service_type" disabled>
+    </div>
+    <div class="form-row">
+        <label>Input Topics</label>
+    </div>
+    <div class="form-row" id="in_topics" onchange="update_topics_JSON()">
+    </div>
+    <div class="form-row">
+        <label>Output Topics</label>
+    </div>
+    <div class="form-row" id="out_topics" onchange="update_topics_JSON()">
+    </div>
+    <div class="form-row">
+        <label>New Service Name: </label> <input type="text" id="node-input-new_s_name" disabled>
+    </div>
+    <div class="form-row">
+         <input type="button" id="node-create_new" value="Create!" onclick="duplicate_service()" disabled>
+    </div>
+    <div class="form-row">
+        <label for="node-input-topics">Topics JSON</label>
+        <input type="text" id="node-input-topics">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="synaisthisi-service">
+    <p>A node to manage a service of the SYNAISTHISI platform</p>
+</script>
+
+
+ 
+

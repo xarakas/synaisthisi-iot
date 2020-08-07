@@ -6,7 +6,7 @@ ADD pType.py /
 ADD requirements.txt /
 ADD haarcascade_frontalface_default.xml /
 
-ADD loop.py /
+ADD pType.py /
 
 RUN pip install -r requirements.txt
 
@@ -14,4 +14,4 @@ RUN pip install -r requirements.txt
 CMD [ "python", "./pType.py" ]
 
 
-# CMD [ "python", "./loop.py" ]
+

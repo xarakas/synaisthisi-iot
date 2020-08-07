@@ -3,12 +3,21 @@
 FROM nginx:latest
 
 # Nginx will listen on this port
+EXPOSE 443
 EXPOSE 80
-
 # Remove the default config file that
 # /etc/nginx/nginx.conf includes
 RUN rm /etc/nginx/conf.d/default.conf
 
 # We copy the requirements file in order to install
 # Python dependencies
+#
+#
 COPY syndelesis.conf /etc/nginx/conf.d
+
+# sevangelou addition
+RUN mkdir -p /etc/ssl
+RUN apt-get update
+RUN apt-get -y install openssl
+RUN openssl req -subj '/C=GR/ST=Athens/L=AgiaParaskevi/O=NCSR Demokritos/OU=IIT/CN=localhost' -x509 -nodes -days 3650 -newkey rsa:4096 -keyout /etc/ssl/key.key -out /etc/ssl/cert.crt
+RUN yes | apt-get remove openssl

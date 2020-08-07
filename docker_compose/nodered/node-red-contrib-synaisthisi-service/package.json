@@ -1,0 +1,21 @@
+{
+  "name": "node-red-contrib-synaisthisi-service",
+  "version": "0.0.1",
+  "description": "Connector for creating nodes out of SYNAISTHISI services",
+  "main": "synaisthisi-service.js",
+  "node-red": {
+    "nodes": {
+      "synaisthisi-service": "synaisthisi-service.js"
+    }
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "SYNAISTHISI",
+    "IoT",
+    "Microservices"
+  ],
+  "author": "C. Akasiadis",
+  "license": "ISC"
+}

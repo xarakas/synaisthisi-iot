@@ -3,7 +3,7 @@ FROM alpine:3.7
 RUN apk add --no-cache sudo vim curl nmap bash logrotate unzip curl openjdk8-jre openjdk8 maven iputils git
 
 WORKDIR /
-RUN git clone http://git.eclipse.org/gitroot/om2m/org.eclipse.om2m.git
+RUN git clone https://git.eclipse.org/r/om2m/org.eclipse.om2m.git
 
 WORKDIR org.eclipse.om2m
 # Edw gia extra configs

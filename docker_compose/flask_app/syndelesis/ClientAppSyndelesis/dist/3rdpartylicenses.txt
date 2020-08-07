@@ -1,3 +1,7 @@
+swagger-ui-dist@3.25.0
+Apache-2.0
+Apache-2.0
+
 bootstrap@3.3.7
 MIT
 The MIT License (MIT)
