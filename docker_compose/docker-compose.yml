@@ -51,7 +51,7 @@ services:
       dockerfile: Dockerfile-rdf4j
     ports:
      - 8083:8083
-     - 8444:8443
+     - 8443:8443
     networks:
      - syntelesis-network
 
@@ -122,7 +122,7 @@ services:
       context: om2m
       dockerfile: Dockerfile-om2m
     ports:
-     - "8081:8080"
+     - "8080:8080"
     networks:
      - syntelesis-network
     depends_on:

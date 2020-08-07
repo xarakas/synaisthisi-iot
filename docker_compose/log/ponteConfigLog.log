@@ -1,34 +1,8 @@
-{"name":"ponteConfigLog","hostname":"34e8ba5119c0","pid":6,"level":30,"msg":"Authenticate MQTT called -- User: dat_vpitsilis Password: qwerty","time":"2019-09-05T14:23:50.491Z","v":0}
-{"name":"ponteConfigLog","hostname":"34e8ba5119c0","pid":6,"level":30,"msg":"Portal response status code: 200","time":"2019-09-05T14:23:51.088Z","v":0}
-{"name":"ponteConfigLog","hostname":"34e8ba5119c0","pid":6,"level":30,"msg":"Authorize SUB MQTT called -- Topic: input/1 User: dat_vpitsilis","time":"2019-09-05T14:23:51.097Z","v":0}
-{"name":"ponteConfigLog","hostname":"34e8ba5119c0","pid":6,"level":30,"msg":"Portal response status code: 200","time":"2019-09-05T14:23:51.108Z","v":0}
-{"name":"ponteConfigLog","hostname":"aab5f9054aaa","pid":6,"level":30,"msg":"Authenticate MQTT called -- User: new Password: newnew2","time":"2019-09-30T22:38:21.013Z","v":0}
-{"name":"ponteConfigLog","hostname":"aab5f9054aaa","pid":6,"level":30,"msg":"Portal response status code: 200","time":"2019-09-30T22:38:21.654Z","v":0}
-{"name":"ponteConfigLog","hostname":"aab5f9054aaa","pid":6,"level":30,"msg":"Authorize SUB MQTT called -- Topic: 1in User: new","time":"2019-09-30T22:38:21.681Z","v":0}
-{"name":"ponteConfigLog","hostname":"aab5f9054aaa","pid":6,"level":30,"msg":"Authorize SUB MQTT called -- Topic: 2in User: new","time":"2019-09-30T22:38:21.684Z","v":0}
-{"name":"ponteConfigLog","hostname":"aab5f9054aaa","pid":6,"level":30,"msg":"Authorize SUB MQTT called -- Topic: 3in User: new","time":"2019-09-30T22:38:21.686Z","v":0}
-{"name":"ponteConfigLog","hostname":"aab5f9054aaa","pid":6,"level":30,"msg":"Authorize SUB MQTT called -- Topic: disconnect User: new","time":"2019-09-30T22:38:21.687Z","v":0}
-{"name":"ponteConfigLog","hostname":"aab5f9054aaa","pid":6,"level":30,"msg":"Portal response status code: 200","time":"2019-09-30T22:38:21.746Z","v":0}
-{"name":"ponteConfigLog","hostname":"aab5f9054aaa","pid":6,"level":30,"msg":"Portal response status code: 200","time":"2019-09-30T22:38:21.756Z","v":0}
-{"name":"ponteConfigLog","hostname":"aab5f9054aaa","pid":6,"level":30,"msg":"Portal response status code: 200","time":"2019-09-30T22:38:21.765Z","v":0}
-{"name":"ponteConfigLog","hostname":"aab5f9054aaa","pid":6,"level":30,"msg":"Portal response status code: 403","time":"2019-09-30T22:38:21.768Z","v":0}
-{"name":"ponteConfigLog","hostname":"ae087bd32fe7","pid":6,"level":30,"msg":"Authenticate MQTT called -- User: new Password: newnew2","time":"2019-10-02T12:05:12.866Z","v":0}
-{"name":"ponteConfigLog","hostname":"ae087bd32fe7","pid":6,"level":30,"msg":"Portal response status code: 200","time":"2019-10-02T12:05:13.482Z","v":0}
-{"name":"ponteConfigLog","hostname":"ae087bd32fe7","pid":6,"level":30,"msg":"Authorize SUB MQTT called -- Topic: 1in User: new","time":"2019-10-02T12:05:13.503Z","v":0}
-{"name":"ponteConfigLog","hostname":"ae087bd32fe7","pid":6,"level":30,"msg":"Authorize SUB MQTT called -- Topic: 2in User: new","time":"2019-10-02T12:05:13.505Z","v":0}
-{"name":"ponteConfigLog","hostname":"ae087bd32fe7","pid":6,"level":30,"msg":"Authorize SUB MQTT called -- Topic: 3in User: new","time":"2019-10-02T12:05:13.508Z","v":0}
-{"name":"ponteConfigLog","hostname":"ae087bd32fe7","pid":6,"level":30,"msg":"Authorize SUB MQTT called -- Topic: disconnect User: new","time":"2019-10-02T12:05:13.511Z","v":0}
-{"name":"ponteConfigLog","hostname":"ae087bd32fe7","pid":6,"level":30,"msg":"Portal response status code: 200","time":"2019-10-02T12:05:13.553Z","v":0}
-{"name":"ponteConfigLog","hostname":"ae087bd32fe7","pid":6,"level":30,"msg":"Portal response status code: 200","time":"2019-10-02T12:05:13.572Z","v":0}
-{"name":"ponteConfigLog","hostname":"ae087bd32fe7","pid":6,"level":30,"msg":"Portal response status code: 200","time":"2019-10-02T12:05:13.577Z","v":0}
-{"name":"ponteConfigLog","hostname":"ae087bd32fe7","pid":6,"level":30,"msg":"Portal response status code: 403","time":"2019-10-02T12:05:13.589Z","v":0}
-{"name":"ponteConfigLog","hostname":"ae087bd32fe7","pid":6,"level":30,"msg":"Authenticate MQTT called -- User: new Password: newnew2","time":"2019-10-02T12:06:34.942Z","v":0}
-{"name":"ponteConfigLog","hostname":"ae087bd32fe7","pid":6,"level":30,"msg":"Portal response status code: 200","time":"2019-10-02T12:06:35.513Z","v":0}
-{"name":"ponteConfigLog","hostname":"ae087bd32fe7","pid":6,"level":30,"msg":"Authorize SUB MQTT called -- Topic: 1in User: new","time":"2019-10-02T12:06:35.522Z","v":0}
-{"name":"ponteConfigLog","hostname":"ae087bd32fe7","pid":6,"level":30,"msg":"Authorize SUB MQTT called -- Topic: 2in User: new","time":"2019-10-02T12:06:35.524Z","v":0}
-{"name":"ponteConfigLog","hostname":"ae087bd32fe7","pid":6,"level":30,"msg":"Authorize SUB MQTT called -- Topic: 3in User: new","time":"2019-10-02T12:06:35.526Z","v":0}
-{"name":"ponteConfigLog","hostname":"ae087bd32fe7","pid":6,"level":30,"msg":"Authorize SUB MQTT called -- Topic: disconnect User: new","time":"2019-10-02T12:06:35.528Z","v":0}
-{"name":"ponteConfigLog","hostname":"ae087bd32fe7","pid":6,"level":30,"msg":"Portal response status code: 403","time":"2019-10-02T12:06:35.622Z","v":0}
-{"name":"ponteConfigLog","hostname":"ae087bd32fe7","pid":6,"level":30,"msg":"Portal response status code: 200","time":"2019-10-02T12:06:35.635Z","v":0}
-{"name":"ponteConfigLog","hostname":"ae087bd32fe7","pid":6,"level":30,"msg":"Portal response status code: 200","time":"2019-10-02T12:06:35.637Z","v":0}
-{"name":"ponteConfigLog","hostname":"ae087bd32fe7","pid":6,"level":30,"msg":"Portal response status code: 200","time":"2019-10-02T12:06:35.641Z","v":0}
+{"name":"ponteConfigLog","hostname":"dc1ac965c030","pid":8,"level":30,"msg":"Authenticate MQTT called -- User: new","time":"2020-08-07T14:18:45.056Z","v":0}
+{"name":"ponteConfigLog","hostname":"dc1ac965c030","pid":8,"level":30,"msg":"Portal response status code: 200","time":"2020-08-07T14:18:45.617Z","v":0}
+{"name":"ponteConfigLog","hostname":"dc1ac965c030","pid":8,"level":30,"msg":"Authorize SUB MQTT called -- Topic: test User: new","time":"2020-08-07T14:18:45.625Z","v":0}
+{"name":"ponteConfigLog","hostname":"dc1ac965c030","pid":8,"level":30,"msg":"Portal response status code: 200","time":"2020-08-07T14:18:45.637Z","v":0}
+{"name":"ponteConfigLog","hostname":"dc1ac965c030","pid":8,"level":30,"msg":"Authenticate HTTP called -- URL: /resources/test User: new","time":"2020-08-07T14:19:03.784Z","v":0}
+{"name":"ponteConfigLog","hostname":"dc1ac965c030","pid":8,"level":30,"msg":"Portal response status code: 200","time":"2020-08-07T14:19:04.292Z","v":0}
+{"name":"ponteConfigLog","hostname":"dc1ac965c030","pid":8,"level":30,"msg":"Authorize PUT HTTP called -- Topic: test User: new","time":"2020-08-07T14:19:04.294Z","v":0}
+{"name":"ponteConfigLog","hostname":"dc1ac965c030","pid":8,"level":30,"msg":"Portal response status code: 200","time":"2020-08-07T14:19:04.302Z","v":0}
