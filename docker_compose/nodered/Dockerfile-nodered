@@ -1,16 +1,3 @@
-FROM nodered/node-red
-ADD ./node-red-contrib-synaisthisi-service /usr/src/node-red/node-red-contrib-synaisthisi-service/
-ADD ./settings.js /usr/src/node-red/customsettings.js
-ADD ./user-authentication.js /usr/src/node-red/user-authentication.js
-RUN npm install request
-RUN npm install node-red-contrib-synaisthisi-service
-
-# sevangelou additions
-USER root
-RUN openssl req -subj '/C=GR/ST=Athens/L=AgiaParaskevi/O=NCSR Demokritos/OU=IIT/CN=localhost' -x509 -nodes -days 3650 -newkey rsa:4096 -keyout /etc/ssl/key.key -out /etc/ssl/cert.crt
-RUN chown node-red /etc/ssl/cert.crt
-RUN chown node-red /etc/ssl/key.key
-USER node-red
-# end of sevangelou additions
+FROM synaisthisi/syntelesis-nodered:common
 
 CMD ["node-red","-s","/usr/src/node-red/customsettings.js"]

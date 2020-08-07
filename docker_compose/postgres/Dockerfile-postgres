@@ -1,6 +1,6 @@
 # Dockerfile-postgres
 
-FROM postgres:latest
+FROM synaisthisi/syntelesis-postgres:common
 
 # Nginx will listen on this port
 EXPOSE 5432

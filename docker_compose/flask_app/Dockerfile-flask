@@ -4,26 +4,7 @@
 #FROM vpitsilis/syntelesis-flask-app
 
 # else run this from within syntelesis root dir to recreate docker image
-FROM python:3.6-alpine
-
-RUN apk update && apk upgrade
-
-# python libs and components needed for python requirements
-RUN \
- apk add --no-cache postgresql-libs && \
- apk add --no-cache --virtual .build-deps gcc musl-dev postgresql-dev libffi-dev
-
-# add local dir as docker /code dir
-ADD . /code
-RUN mkdir /shared
-# cd to this dir
-WORKDIR /code
-
-# Expose port uWSGI will listen on
-EXPOSE 5000
-
-# install python app dependencies
-RUN pip install -r requirments.txt
+FROM synaisthisi/syntelesis-flask-app:common
 
 # run uWSGI with the ini file 
 CMD ["uwsgi", "--ini", "uwsgi.ini"]

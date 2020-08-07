@@ -1,23 +1,8 @@
 # Dockerfile-rabbitmq
 
 # https://hub.docker.com/_/rabbitmq/
-FROM rabbitmq:3-management
+FROM synaisthisi/syntelesis-rabbitmq:common
   
-# rabbitmq will listen on these ports
-EXPOSE 15672
-EXPOSE 5672
-EXPOSE 1885
-#EXPOSE 8883 # sevangelou
-
-RUN rabbitmq-plugins enable --offline rabbitmq_mqtt
-
-COPY rabbitmq.conf /etc/rabbitmq/rabbitmq.config
-#COPY key.pem /etc/rabbitmq/key.pem # sevangelou
-#COPY cert.pem /etc/rabbitmq/cert.pem # sevangelou
-#COPY cacert.pem /etc/rabbitmq/cacert.pem # sevangelou
-
-ADD rabbitmq.init.sh /usr/local/bin/init.sh
-RUN chmod +x /usr/local/bin/init.sh
 
 CMD ["/usr/local/bin/init.sh"]
 

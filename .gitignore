@@ -1,2 +1,3 @@
 ./docker_compose/shared/*
 ./docker_compose/log/*
+./docker_compose/.env
