@@ -4,7 +4,7 @@
 #FROM vpitsilis/syntelesis-flask-app
 
 # else run this from within syntelesis root dir to recreate docker image
-FROM synaisthisi/syntelesis-flask-app:common
+FROM synaisthisi/syntelesis-flask-app:latest
 
 # run uWSGI with the ini file 
 CMD ["uwsgi", "--ini", "uwsgi.ini"]

@@ -1,0 +1,1444 @@
+swagger: "2.0"
+info:
+  description: "SYNAISTHISI IoT platform."
+  version: "1.0.0"
+  title: "SYNAISTHISI Platform API"
+  termsOfService: "http://iot.synaisthisi.iit.demokritos.gr"
+  contact:
+    email: "synaisthisi@iit.demokritos.gr"
+  # license:
+  #   name: "Apache 2.0"
+  #   url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+# host: "synaisthisi.iit.demokritos.gr"
+host: "localhost"
+basePath: "/"
+tags:
+- name: "userAuth"
+  description: "User authentication"
+  # externalDocs:
+  #   description: "Find out more"
+  #   url: "***"
+- name: "userAccount"
+  description: "User data"
+  # externalDocs:
+  #   description: "Find out more"
+  #   url: "***"
+- name: "topics"
+  description: "Platform IoT topics"
+- name: "services"
+  description: "Platform IoT services"
+- name: "usersServices"
+  description: "Users Sevices Mapping"
+- name: "usersTopics"
+  description: "Users Topics Mapping"
+- name: "IoTBrokerServices"
+  description: "Platform IoT brokers services"
+
+schemes:
+# - "https"
+- "http"
+paths:
+  /register:
+      post:
+        tags:
+        - "userAuth"
+        summary: "Create a new user"
+        description: "Register a new user in SYNAISTHISI platform."
+        operationId: "registerUser"
+        consumes:
+        - "application/json"
+        produces:
+        - "application/json"
+        parameters:
+        - in: "body"
+          name: "body"
+          description: "User to register"
+          # required: true
+          schema:
+            $ref: "#/definitions/PostUser"
+        responses:
+          201:
+            description: "successfully registered"
+            schema:
+              type: "object"
+              properties:
+                status:
+                  type: "string"
+                  example: "success"
+                message:
+                  type: "string"
+                  example: "User authenticated."
+                data:
+                  $ref: "#/definitions/User"
+                access_token:
+                  type: "string"
+                  description: "jwt bearer token for requests header"
+                  example: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1NzU4ODMxNDMsImlhdCI6MTU3NTg4MjI0MywibmJmIjoxNTc1ODgyMjQzLCJqdGkiOiI3MzVkZDI2OC1iNjUxLTQ5YmYtOTlmZC1lM2EyY2Y4OWQyZTYiLCJpZGVudGl0eSI6MiwiZnJlc2giOmZhbHNlLCJ0eXBlIjoiYWNjZXNzIiwidXNlcl9jbGFpbXMiOnsidXNlcm5hbWUiOiJzeW5haXN0aGlzaXMiLCJlbWFpbCI6InN5bmFpc3RoaXNpc0BpaXQuZGVtb2tyaXRvcy5nciIsImFkbWluIjpmYWxzZX19.lKmc5dh8eP-r32zRgz7rmvZT4gPySoYqIlOmY4YAKEQ"
+          400:
+            description: "operation failed"
+            schema:
+              $ref: "#/definitions/ApiFailedResponse"
+            examples:
+              "Invalid Username":
+                message: "Username is not valid"
+              "Invalid email":
+                message: "Email is not valid"
+              "Not permitted":
+                message: "Name is not permitted"
+              "exists":
+                message: "A User with this name alreday exists"        
+  /login:
+      post:
+        tags:
+        - "userAuth"
+        summary: "Sign in user"
+        description: "User login."
+        operationId: "loginUser"
+        consumes:
+        - "application/json"
+        produces:
+        - "application/json"
+        parameters:
+        - in: "body"
+          name: "body"
+          description: Use either username or email to login
+          # required: true
+          schema:
+            $ref: "#/definitions/PostUser"
+        responses:
+          201:
+            description: "user authenticated"
+            schema:
+              type: "object"
+              properties:
+                status:
+                  type: "string"
+                  example: "success"
+                message:
+                  type: "string"
+                  example: "User authenticated."
+                data:
+                  $ref: "#/definitions/User"
+                access_token:
+                  type: "string"
+                  description: "jwt bearer token for requests header"
+                  example: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1NzU5MDU3OTQsImlhdCI6MTU3NTkwNDg5NCwibmJmIjoxNTc1OTA0ODk0LCJqdGkiOiJmN2ZhOTE2ZC02MDdjLTRjOTctYjdjZS1iMDI3MGZkNjYwYTgiLCJpZGVudGl0eSI6MiwiZnJlc2giOnRydWUsInR5cGUiOiJhY2Nlc3MiLCJ1c2VyX2NsYWltcyI6eyJ1c2VybmFtZSI6InN5bmFpc3RoaXNpcyIsImVtYWlsIjoic3luYWlzdGhpc2lzQGlpdC5kZW1va3JpdG9zLmdyIiwiYWRtaW4iOmZhbHNlfX0.GI1CoUW3ZvUBaD8bWPFQpm3Ef_AO099OhcAo7yEQCA4"
+                refresh_token:
+                  type: "string"
+                  description: "token to get a fresh jwt bearer token"
+                  example: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1Nzg0OTY4OTQsImlhdCI6MTU3NTkwNDg5NCwibmJmIjoxNTc1OTA0ODk0LCJqdGkiOiI2NTY0M2Q5MS1mYmNlLTQ0N2QtYjNkMC0zOWRkMDM1YTc1ZDQiLCJpZGVudGl0eSI6MiwidHlwZSI6InJlZnJlc2gifQ.4dZ6k4jC5B2EryLmPWLqJznw6zYopEWbdDafuXW2c9s"
+          401:
+            description: "operation failed"
+            schema:
+              $ref: "#/definitions/ApiFailedResponse"
+          404:
+            description: "operation failed"
+            schema:
+              $ref: "#/definitions/ApiFailedResponse"
+  /refresh:
+      post:
+        tags:
+        - "userAuth"
+        summary: "refresh user jwt token"
+        description: "Get a new jwt token."
+        operationId: "refreshJWTToken"
+        produces:
+        - "application/json"
+        responses:
+          200:
+            description: "valid jwt token"
+            schema:
+              type: "object"
+              properties:
+                access_token:
+                  type: "string"
+                  description: "valid jwt bearer token"
+                  example: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1NzU5MDU2OTEsImlhdCI6MTU3NTkwNDc5MSwibmJmIjoxNTc1OTA0NzkxLCJqdGkiOiI2MzdjYjc4ZC1jY2ExLTRhNjMtODU4Mi0zODc2ZTA5NzdiOWUiLCJpZGVudGl0eSI6MiwiZnJlc2giOmZhbHNlLCJ0eXBlIjoiYWNjZXNzIiwidXNlcl9jbGFpbXMiOnsidXNlcm5hbWUiOiJzeW5haXN0aGlzaXMiLCJlbWFpbCI6InN5bmFpc3RoaXNpc0BpaXQuZGVtb2tyaXRvcy5nciIsImFkbWluIjpmYWxzZX19.9hOi1jZANUxc6otVkv-K1YZteGwOPUw9B43D6RkIKSI"
+        security:
+        - Bearer: []
+  /logout:
+      post:
+        tags:
+        - "userAuth"
+        summary: "Log out user"
+        description: "User logout."
+        operationId: "logoutUser"
+        produces:
+        - "application/json"
+        responses:
+          200:
+            description: "user logged out"
+            schema:
+              type: "object"
+              properties:
+                status:
+                  type: "string"
+                message:
+                  type: "string"
+              example: {
+                  "status": "success",
+                  "message": "User synaisthisi successfully logged out."
+              }
+        security:
+        - Bearer: []
+  /accounts/{user_id}:
+      parameters:
+        - name: "user_id"
+          in: "path"
+          description: "ID of user to return"
+          required: true
+          type: "integer"
+          format: "int64"
+      get:
+        tags:
+        - "userAccount"
+        summary: "get user infos"
+        description: "Find user by id and get user object information."
+        operationId: "getUserById"
+        produces:
+        - "application/json"
+        responses:
+          200:
+            description: "user object"
+            schema:
+              $ref: "#/definitions/User"
+          404:
+            description: "User not found"
+            schema:
+              $ref: "#/definitions/ApiFailedResponse"
+        security:
+        - Bearer: []
+      put:
+        tags:
+        - "userAccount"
+        summary: "update user infos"
+        description: "Find user by id and update user object information, email or/and password."
+        operationId: "updateUserById"
+        consumes:
+        - "application/json"
+        produces:
+        - "application/json"
+        parameters:
+        - in: "body"
+          name: "body"
+          description: "Update user object"
+          required: true
+          schema:
+            type: "object"
+            properties:
+              email:
+                type: "string"
+              password:
+                type: "string"
+            example: {
+              "email": synaisthisi@iit.demokritos.gr,
+              "password": "qwerty"
+            }
+        responses:
+          200:
+            description: "user object"
+            schema:
+              $ref: "#/definitions/User"
+          400:
+            description: "Email not valid"
+            schema:
+              $ref: "#/definitions/ApiFailedResponse"              
+          404:
+            description: "User not found"
+            schema:
+              $ref: "#/definitions/ApiFailedResponse"
+        security:
+        - Bearer: []
+      delete:
+        tags:
+        - "userAccount"
+        summary: "delete user"
+        description: "Find user by id and delete."
+        operationId: "deleteUserById"
+        produces:
+        - "application/json"
+        responses:
+          200:
+            description: "user deleted"
+            schema:
+              type: "string"
+              example: "User deleted"
+          404:
+            description: "User not found"
+            schema:
+              $ref: "#/definitions/ApiFailedResponse"
+        security:
+        - Bearer: []
+  /topics:
+      get:
+        tags:
+        - "topics"
+        summary: "Get platform registered topics"
+        description: "Get topics. Returns all platform topics if no parameter is provided.
+                      Filter topics by name or description or topic_ontology if the respective parameter is provided.
+                      Filter by (find in) any of the above if parameter term is provided"
+        operationId: "getTopics"
+        produces:
+        - "application/json"
+        parameters:
+        - name: "term"
+          in: "query"
+          description: "Used to search for topics containing 'term' in either name, description, or topic_ontology"
+          required: false
+          type: "string"
+        - name: "name"
+          in: "query"
+          description: "Used to search for topics containing the provided string in 'name'"
+          required: false
+          type: "string"
+        - name: "description"
+          in: "query"
+          description: "Used to search for topics containing the provided string in 'description'"
+          required: false
+          type: "string"
+        - name: "topic_ontology"
+          in: "query"
+          description: "Used to search for topics containing the provided string in 'topic_ontology'"
+          required: false
+          type: "string"
+        responses:
+          200:
+            description: "Array of topic objects"
+            schema:
+              type: "array"
+              items:
+                $ref: "#/definitions/Topic"
+        security:
+        - Bearer: []
+      post:
+        tags:
+        - "topics"
+        summary: "Create topic"
+        description: "Create a new topic in the platform."
+        operationId: "createTopic"
+        consumes:
+        - "application/json"
+        produces:
+        - "application/json"
+        parameters:
+        - in: "body"
+          name: "body"
+          description: "Object with required fields for the topic to be created."
+          # required: true
+          schema:
+            $ref: "#/definitions/Topic"
+        responses:
+          201:
+            description: "Operation success. Return topic information."
+            schema:
+              $ref: "#/definitions/Topic"
+          400:
+            description: "operation failed"
+            schema:
+              $ref: "#/definitions/ApiFailedResponse"
+        security:
+        - Bearer: []
+  /services:
+      get:
+        tags:
+        - "services"
+        summary: "get system registered services"
+        description: "Get services. Returns all platform IoT services if no parameter provided.
+                      Filter services by name, description, or service_ontology, if the respective parameter is provided.
+                      Filter by (find in) any of the above if parameter term is provided"
+        operationId: "getServices"
+        produces:
+        - "application/json"
+        parameters:
+        - name: "term"
+          in: "query"
+          description: "Used to search for services containing 'term' in either name, description, or topic_ontology"
+          required: false
+          type: "string"
+        - name: "name"
+          in: "query"
+          description: "Used to search for services containing provided string in 'name'"
+          required: false
+          type: "string"
+        - name: "description"
+          in: "query"
+          description: "Used to search for services containing provided string in 'description'"
+          required: false
+          type: "string"
+        - name: "service_ontology"
+          in: "query"
+          description: "Used to search for servies containing provided string in 'topic_ontology'"
+          required: false
+          type: "string"
+        responses:
+          200:
+            description: "Array of IoT service objects"
+            schema:
+              type: "array"
+              items:
+                $ref: "#/definitions/ServiceExtended"
+        security:
+        - Bearer: []
+      post:
+          tags:
+          - "services"
+          summary: "Create IoT service"
+          description: "Create a new IoT service in the platform. Service MUST have at least one input or output topic."
+          operationId: "createService"
+          consumes:
+          - "application/json"
+          produces:
+          - "application/json"
+          parameters:
+          - in: "body"
+            name: "body"
+            description: "Object with all required fields of the IoT Service to create."
+            # required: true
+            schema:
+              $ref: "#/definitions/Service"
+          responses:
+            201:
+              description: "Operation success. Returns the topic information."
+              schema:
+                $ref: "#/definitions/Service"
+            400:
+              description: "Operation failed"
+              schema:
+                $ref: "#/definitions/ApiFailedResponse"
+          security:
+          - Bearer: []
+  /services/{service_id}:
+      parameters:
+        - name: "service_id"
+          in: "path"
+          description: "ID of service to return"
+          required: true
+          type: "integer"
+          format: "int64"
+      get:
+        tags:
+        - "services"
+        summary: "get service infos"
+        description: "Find service by id and get service object information. Included in response data is a list of service subscribers"
+        operationId: "getServiceById"
+        produces:
+        - "application/json"
+        responses:
+          200:
+            description: "Service object with subscribers list"
+            schema:
+              $ref: "#/definitions/ServiceWithSubscribers"
+          404:
+            description: "Invalid service"
+            schema:
+              $ref: "#/definitions/ApiFailedResponse"
+        security:
+        - Bearer: []
+      delete:
+        tags:
+        - "services"
+        summary: "delete service"
+        description: "Find service by id and delete it."
+        operationId: "deleteServiceById"
+        produces:
+        - "application/json"
+        responses:
+          200:
+            description: "Service deleted"
+            schema:
+              type: "object"
+              properties:
+                message:
+                  type: "string"
+                  example: "Service deleted"
+          400:
+            description: "Invalid service."
+            schema:
+              $ref: "#/definitions/ApiFailedResponse"
+          401:
+            description: "User is not service owner and is not permitted to delete it"
+            schema:
+              $ref: "#/definitions/ApiFailedResponse"              
+        security:
+        - Bearer: []
+      put:
+          tags:
+          - "services"
+          summary: "Update IoT service"
+          description: "Find IoT service by id and update fields. Service MUST have at least one input or output topic. User MUST be service owner"
+          operationId: "updateService"
+          consumes:
+          - "application/json"
+          produces:
+          - "application/json"
+          parameters:
+          - in: "body"
+            name: "body"
+            description: "Update IoT Service."
+            # required: true
+            schema:
+              $ref: "#/definitions/Service"
+          responses:
+            200:
+              description: "Operation success. Return service information."
+              schema:
+                $ref: "#/definitions/Service"
+            400:
+              description: "Operation failed"
+              schema:
+                $ref: "#/definitions/ApiFailedResponse"
+              examples:
+                "Invalid name":
+                  message: "Not a valid name"
+                "Service name duplicate":
+                  message: "A service with name ... already exists"
+                "No topics":
+                  message: "At least an input or output topic is needed."
+            401:
+              description: "not permitted"
+              schema:
+                $ref: "#/definitions/ApiFailedResponse"
+              examples:
+                "Topics use not permitted":
+                  message: "User not permitted to subscribe to or use topic"
+                "User not owner":
+                  message: "Not permitted"
+            404:
+              description: "not found"
+              schema:
+                $ref: "#/definitions/ApiFailedResponse"
+              examples:
+                "Not found":
+                  message: "No such service found"
+
+          security:
+          - Bearer: []
+      post:
+          tags:
+          - "services"
+          summary: "Duplicate IoT service"
+          description: "Find IoT service by id and make a duplicate. Duplicate all service uploaded files. All service fields can be updated."
+          operationId: "duplicateService"
+          consumes:
+          - "application/json"
+          produces:
+          - "application/json"
+          parameters:
+          - in: "body"
+            name: "body"
+            description: "Duplicate IoT Service."
+            # required: true
+            schema:
+              $ref: "#/definitions/Service"
+          responses:
+            201:
+              description: "Operation success. Return new (duplicate) service information."
+              schema:
+                $ref: "#/definitions/Service"
+            400:
+              description: "operation failed"
+              schema:
+                $ref: "#/definitions/ApiFailedResponse"
+              examples:
+                "Invalid name":
+                  message: "Not a valid name"
+                "Service name duplicate":
+                  message: "A service with name ... already exists"
+                "No topics":
+                  message: "At least an input or output topic is needed."
+                "Error copying service files":
+                  message: "Could not create service. Failed while copying service files."
+            401:
+              description: "not permitted"
+              schema:
+                $ref: "#/definitions/ApiFailedResponse"
+              examples:
+                "Topics use not permitted":
+                  message: "User not permitted to subscribe to or use topic"
+            404:
+              description: "not found"
+              schema:
+                $ref: "#/definitions/ApiFailedResponse"
+              examples:
+                "Not found":
+                  message: "No such service found"
+          security:
+          - Bearer: []
+  /users/{user_id}/topics:
+    parameters:
+      - name: "user_id"
+        in: "path"
+        description: "ID of user to return their topics"
+        required: true
+        type: "integer"
+        format: "int64"
+    get:
+        tags:
+        - "usersTopics"
+        summary: "Get all system registered user topics."
+        description: "Get all system registered topics where specified user (user_id) has at least SUBSCRIBE or PUBLISH rights or both. 
+                      If argument 'type' is not provided, then get all topics where user has either pur or sub rights
+                      Only topic owner (user who created it) has both PUB and SUB rights"
+        operationId: "getUserTopics"
+        produces:
+        - "application/json"
+        parameters:
+        - name: "type"
+          in: "query"
+          description: "Type of specified privilleges used to filter user topics"
+          required: false
+          type: "string"
+          enum:
+            - sub
+            - pub
+        responses:
+          200:
+            description: "Array of topic objects enriched with user previlleges (SUB, PUB)"
+            schema:
+              type: "array"
+              items:
+                $ref: "#/definitions/UserTopics"
+        security:
+        - Bearer: []
+  /users/{user_id}/topics/{topic_id}:
+    parameters:
+      - name: "user_id"
+        in: "path"
+        description: "ID of user"
+        required: true
+        type: "integer"
+        format: "int64"
+      - name: "topic_id"
+        in: "path"
+        description: "ID of topic"
+        required: true
+        type: "integer"
+        format: "int64"      
+    get:
+        tags:
+        - "usersTopics"
+        summary: "get user/topic mapping."
+        description: "Get user previlleges on a specified topic"
+        operationId: "getUserTopicPrevillegesInformation"
+        produces:
+        - "application/json"
+        responses:
+          200:
+            description: "topic objects enriched with user previlleges (SUB, PUB)"
+            schema:
+              $ref: "#/definitions/UserTopics"
+        security:
+        - Bearer: []
+    put:
+        tags:
+        - "usersTopics"
+        summary: "Update user permissions on a topic."
+        description: "Register user as a topic subscriber. After this call, the user has SUB rights on the specified topic."
+        operationId: "updateUserTopicPrevilleges"
+        produces:
+        - "application/json"
+        responses:
+          201:
+            description: "User acquired subscription previlleges on the specified topic"
+            schema:
+              $ref: "#/definitions/Topic"
+          404:
+            description: "Operation failed because of invalid topic or user"
+            schema:
+              $ref: "#/definitions/ApiFailedResponse"
+            examples:
+              "Invalid user/topic":
+                message: "Invalid User or Topic does not exist"
+        security:
+        - Bearer: []
+    delete:
+        tags:
+        - "usersTopics"
+        summary: "Delete topic."
+        description: "Delete topic if and only if user is topic owner (has both PUB and SUB righrs) and topic is not used in any service"
+        operationId: "deleteUserTopic"
+        produces:
+        - "application/json"
+        responses:
+          200:
+            description: "topic deleted from system"
+            schema:
+              properties: 
+                message: 
+                  type: "string"
+                  example: "Topic deleted"
+          401:
+            description: "operation not permitted"
+            schema:
+              $ref: "#/definitions/ApiFailedResponse"
+            examples:
+              "Not topic subscriber":
+                message: "Not permitted."
+              "Not topic owner":
+                message: "Not permitted, not topic owner"
+              "Topic in use":
+                message: "Topic used in services [list of services], delete the services using it and then delete the topic"
+        security:
+        - Bearer: []
+  /users/{user_id}/services:
+    parameters:
+      - name: "user_id"
+        in: "path"
+        description: "ID of user to return their IoT services"
+        required: true
+        type: "integer"
+        format: "int64"
+    get:
+        tags:
+        - "usersServices"
+        summary: "Get all IoT services that the user is owner or subscriber."
+        description: "Get all IoT services for which the user is either owner,
+                      or is service subscriber, i.e. can subscribe to service output topics."
+        operationId: "getUserSubscriptionServices"
+        produces:
+        - "application/json"
+        responses:
+          200:
+            description: "Array of service objects"
+            schema:
+              type: "array"
+              items:
+                $ref: "#/definitions/Service"
+          404:
+            description: "Operation failed because of invalid user"
+            schema:
+              $ref: "#/definitions/ApiFailedResponse"
+            examples: 
+                message: "User does not exist"
+        security:
+        - Bearer: []          
+  /users/{user_id}/services/ownership:
+    parameters:
+      - name: "user_id"
+        in: "path"
+        description: "ID of user to return their IoT services"
+        required: true
+        type: "integer"
+        format: "int64"
+    get:
+      tags:
+      - "usersServices"
+      summary: "Get all system user owned IoT services."
+      description: "Get all IoT services user has created (service owner)."
+      operationId: "getUserOwnedServices"
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: "Array of service objects"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/ServiceExtended"
+        404:
+          description: "Operation failed because of invalid user"
+          schema:
+            properties: 
+              "message": 
+                type: "string"
+                example: "User does not exist"
+      security:
+      - Bearer: []  
+  /users/{user_id}/services/{service_id}:
+    parameters:
+      - name: "user_id"
+        in: "path"
+        description: "ID of user"
+        required: true
+        type: "integer"
+        format: "int64"
+      - name: "service_id"
+        in: "path"
+        description: "ID of service"
+        required: true
+        type: "integer"
+        format: "int64"      
+    get:
+        tags:
+        - "usersServices"
+        summary: "get user/service mapping."
+        description: "Get the association of a User (identified by user_id) and a service (service_id).
+                      Whether the user is service subscriber i.e. user is permitted to subscribe to service output topics."
+        operationId: "getUserServiceSubscriptionInformation"
+        produces:
+        - "application/json"
+        responses:
+          200:
+            description: "Service objects"
+            schema:
+              $ref: "#/definitions/UserServiceMap"
+          404:
+            description: "Operation failed because of invalid service or user"
+            schema:
+              $ref: "#/definitions/ApiFailedResponse"
+            examples:
+              "Invalid user":
+                message: "User does not exist"
+              "Invalid service":
+                message: "No such service"        
+        security:
+        - Bearer: []
+    put:
+        tags:
+        - "usersServices"
+        summary: "Update user permissions on a service."
+        description: "Register user as a service subscriber. 
+                      After this call, the user has SUB rights on all service output topics."
+        operationId: "updateUserServiceSubscription"
+        produces:
+        - "application/json"
+        responses:
+          201:
+            description: "User is service subscriber"
+            schema:
+              $ref: "#/definitions/UserServiceMap"
+          404:
+            description: "Operation failed"
+            schema:
+              $ref: "#/definitions/ApiFailedResponse"
+            examples:
+              "Invalid service":
+                message:  "Invalid service"
+              "Already subscriber":
+                message: "User alreday subscribed to service"
+        security:
+        - Bearer: []
+  /users/{user_id}/services/{service_id}/uploads:
+    parameters:
+      - name: "user_id"
+        in: "path"
+        description: "ID of user"
+        required: true
+        type: "integer"
+        format: "int64"
+      - name: "service_id"
+        in: "path"
+        description: "ID of service"
+        required: true
+        type: "integer"
+        format: "int64"
+    post:
+        tags:
+        - "usersServices"
+        summary: "Upload service files."
+        description: "Upload all service related files. 
+                      Mandatory files in order to have a working IoT service are 
+                      Dockerfile and service code file but further needed files can be uploaded.
+                      Only user owner can upload service files.
+                      Note: service files are also uplaoded/stored to Synaisthisis repository"
+        operationId: "uploadServiceFiles"
+        consumes:
+        - "multipart/form-data"
+        produces:
+        - "application/json"
+        parameters:
+          - in: formData
+            type: file
+            name: service_file
+            description: "the file to uplaod"
+        responses:
+          201:
+            description: "Service objects "
+            schema:
+              description: "Service id"
+              type: integer
+              format: "int64"
+              example: "2"
+          400:
+            description: "General error"
+            schema:
+              $ref: "#/definitions/ApiFailedResponse"
+            examples: 
+              "Os error":
+                message: "OS error occured"
+              "General error":
+                message: "Error occured"
+          404:
+            description: "Failed to save or store file"
+            schema:
+              $ref: "#/definitions/ApiFailedResponse"
+            examples:
+              "ENOENT":
+                message: "Invalid file or directory."
+              "ENETUNREACH":
+                message: "Please check your network connectivity."
+          421:
+            description: "Error connecting to Synaisthisis store"
+            schema:
+              $ref: "#/definitions/ApiFailedResponse"
+            examples: 
+              "ECONNREFUSED":
+                message: "Is marketplace server up?"
+        security:
+        - Bearer: []
+  /users/{user_id}/services/{service_id}/status:
+    parameters:
+      - name: "user_id"
+        in: "path"
+        description: "ID of user"
+        required: true
+        type: "integer"
+        format: "int64"
+      - name: "service_id"
+        in: "path"
+        description: "ID of service"
+        required: true
+        type: "integer"
+        format: "int64"
+    get:
+        tags:
+        - "usersServices"
+        summary: "Get service status."
+        description: "Get servie status, i.e. whether a service is running or not. 
+                      Only the service owner can be authorized to get service status."
+        operationId: "getUserServiceStatus"
+        produces:
+        - "application/json"
+        responses:
+          201:
+            description: "Service status"
+            schema:
+              description: "True: service running, False: ....)"
+              type: boolean
+              example: "True"
+        security:
+        - Bearer: []
+    post:
+        tags:
+        - "usersServices"
+        summary: "Start service."
+        description: "Start service. 
+                      Only service owner can start service."
+        operationId: "startUserService"
+        consumes:
+        - "application/json"
+        produces:
+        - "application/json"
+        parameters:
+        - in: "body"
+          name: "body"
+          description: "A string containing
+                          Run time parameters to be exposed as container environment variables.
+                          User password. User password should be in the form '-p user_password'"
+          required: true
+          schema:
+            type: "object"
+            properties:
+              serviceArgs:
+                type: string
+                example: "--p user_password"
+        responses:
+          200:
+            description: "Service started"
+            schema:
+              description: "Return service id"
+              type: integer
+              format: "int64"
+              example: 2
+          400:
+            description: "General error"
+            schema:
+              $ref: "#/definitions/ApiFailedResponse"
+            examples: 
+              "Service running":
+                message: "Service already running"
+              "Could not start service container":
+                message: "Could not run service, please check logfiles"
+              "OSError":
+                message: "General OS error when starting service container"
+        security:
+        - Bearer: []
+    delete:
+        tags:
+        - "usersServices"
+        summary: "Stop service status."
+        description: "Stop service. 
+                      Only service owner can get service status."
+        operationId: "stopUserService"
+        produces:
+        - "application/json"
+        responses:
+          200:
+            description: "Service stopped"
+            schema:
+              description: "Return service id"
+              type: integer
+              format: "int64"
+              example: 2
+          400:
+            description: "General error"
+            schema:
+              $ref: "#/definitions/ApiFailedResponse"
+            examples: 
+              "Could not stop service container":
+                message: "Could not stop service, please check logfiles"
+        security:
+        - Bearer: []
+  /users/{user_id}/services/{service_id}/logFile:
+    parameters:
+      - name: "user_id"
+        in: "path"
+        description: "ID of user"
+        required: true
+        type: "integer"
+        format: "int64"
+      - name: "service_id"
+        in: "path"
+        description: "ID of service"
+        required: true
+        type: "integer"
+        format: "int64"
+    get:
+        tags:
+        - "usersServices"
+        summary: "Get service log file."
+        description: "Get service log file."
+        operationId: "getServiceLogFile"
+        produces:
+        - "application/text"
+        responses:
+          200:
+            description: "service objects"
+            schema:
+              description: "Service log file"
+              type: file
+          400:
+            description: "Could not get log file"
+            schema:
+              $ref: "#/definitions/ApiFailedResponse"
+            examples: 
+              "Log file does not exist":
+                message: "Could not find a log file for service. Please run at least once this service"
+              "Invalid service":
+                message: "No such serviec exists"
+        security:
+        - Bearer: []       
+  /users/{user_id}/services/{service_id}/exportServices:
+    parameters:
+      - name: "user_id"
+        in: "path"
+        description: "ID of user"
+        required: true
+        type: "integer"
+        format: "int64"
+      - name: "service_id"
+        in: "path"
+        description: "ID of service"
+        required: true
+        type: "integer"
+        format: "int64"
+    get:
+        tags:
+        - "usersServices"
+        summary: "Export user services."
+        description: "Export a json file with user's services metadata."
+        operationId: "exportUserServices"
+        produces:
+        - "text/plain"
+        responses:
+          200:
+            description: "json file with user's services "
+            schema:
+              description: "Services json file"
+              type: file
+        security:
+        - Bearer: []       
+    post:
+        tags:
+        - "usersServices"
+        summary: "Import user services."
+        description: "Upload json file with all user owned services metadata
+                      and import them as user services"
+        operationId: "importUserServices"
+        consumes:
+        - multipart/form-data
+        produces:
+        - "application/json"
+        parameters:
+          - in: formData
+            type: file
+            name: service_import_file
+            description: "json services metadata file formatted as exported from export service"
+        responses:
+          200:
+            description: "service objects "
+            schema:
+              properties: 
+                "message":
+                  type: string
+                  example: "Services created"
+          400:
+            description: "general error"
+            schema:
+              $ref: "#/definitions/ApiFailedResponse"
+            examples: 
+              "Required fields missing":
+                message: "Service name and sevice type are required"
+              "Names in use":
+                message: "Services/Topics with name {name} already exist. Please rename and try again"
+              "Invalid json":
+                message: "Invalid json"
+        security:
+        - Bearer: []    
+  /users/{user_id}/services/{service_id}/dockerImage:
+    parameters:
+    - name: "user_id"
+      in: "path"
+      description: "ID of user"
+      required: true
+      type: "integer"
+      format: "int64"
+    - name: "service_id"
+      in: "path"
+      description: "ID of service"
+      required: true
+      type: "integer"
+      format: "int64"
+    post:
+        tags:
+        - "usersServices"
+        summary: "Build user's service docker image."
+        description: "Build docker image, depends on service files upload. 
+                      Service container runs on this image."
+        operationId: "buildUserServiceImage"
+        produces:
+        - "application/json"
+        responses:
+          200:
+            description: "Docker Image built"
+            schema:
+              description: "Return service id"
+              type: integer
+              format: "int64"
+              example: 2
+          400:
+            description: "Docker error return value"
+            schema:
+              $ref: "#/definitions/ApiFailedResponse"
+        security:
+        - Bearer: []
+  /mqtt/auth:
+      post:
+        tags:
+        - "IoTBrokerServices"
+        summary: "Authenticate user upon broker requests."
+        description: "User is authenticated to use IoT (PUB/SUB) brokers services."
+        operationId: "brokerAuthN"
+        consumes:
+        - "application/json"
+        produces:
+        - "application/json"
+        parameters:
+        - in: "body"
+          name: "body"
+          description: Username and password as registered in platform
+          required: true
+          schema:
+            type: object
+            required:
+              - username
+              - password
+            properties: 
+              username:
+                type: string
+                example: "synaisthisis"
+              password:
+                type: string
+                example: "xyz"
+        responses:
+          200:
+            description: "user authenticated, permitted to use Synaisthisis platform broker services"
+          403:
+            description: "user not permitted to use Synaisthisis platform broker services"  
+  /mqtt/acl:
+      post:
+        tags:
+        - "IoTBrokerServices"
+        summary: "Authorize user against IoT broker services."
+        description: "User is authorized to use IoT (PUB/SUB) brokers services on specific resources."
+        operationId: "brokerAuthZ"
+        consumes:
+        - "application/json"
+        produces:
+        - "application/json"
+        parameters:
+        - in: "body"
+          name: "body"
+          description: Username, platform resource (topic) access level (PUB/SUB)
+          required: true
+          schema:
+            required:
+              - username
+              - topic
+              - acc
+            type: object
+            properties: 
+              username:
+                type: string
+                example: "synaisthisi"
+              topic:
+                type: string
+                example: "home/room/humidity"
+              acc:
+                description: permissions level 01->SUB, 02->PUB, 03->SUB&PUB
+                type: integer
+                enum:
+                  - 0x01
+                  - 0x02
+                  - 0x03
+                example: "01"
+              clientid:
+                type: string
+                example: "office_device"
+        responses:
+          200:
+            description: "user authorized to act on platform requested resource"
+          403:
+            description: "user not permitted to use requested resource"
+  /mqtt/superuser:
+      post:
+        tags:
+        - "IoTBrokerServices"
+        summary: "Authenticate user as super user."
+        description: "User is authenticated as super user and has increased permissions."
+        operationId: "brokerSuperuser"
+        consumes:
+        - "application/json"
+        produces:
+        - "application/json"
+        parameters:
+        - in: "body"
+          name: "body"
+          description: Username and password as registered in platform
+          required: true
+          schema:
+            type: object
+            required:
+              - username
+            properties: 
+              username:
+                type: string
+                example: "administrator"
+        responses:
+          200:
+            description: "Super user authenticated"
+          403:
+            description: "Not super user" 
+  /services/ontology:
+      get:
+        tags:
+        - "services"
+        summary: "Get services ontologies"
+        description: "Get all services ontologies from triple store"
+        operationId: "getServicesOntologies"
+        produces:
+        - "application/json"
+        responses:
+          200:
+            description: "Array of ontologies"
+            schema:
+              type: "array"
+              items: 
+                type: "string"
+          400:  
+            description: "Operation failed"
+            schema:
+              $ref: "#/definitions/ApiFailedResponse"
+  /topics/ontology:
+      get:
+        tags:
+        - "topics"
+        summary: "Get topics ontologies"
+        description: "Get all topics ontologies from triple store"
+        operationId: "getTopicsOntologies"
+        produces:
+        - "application/json"
+        responses:
+          200:
+            description: "Array of ontologies"
+            schema:
+              type: "array"
+              items:
+                type: "string"
+          400:  
+            description: "operation failed"
+            schema:
+              $ref: "#/definitions/ApiFailedResponse"
+
+securityDefinitions:
+  Bearer:
+    description: "Should be 'Bearer <jwt_token>'"
+    type: "apiKey"
+    name: "Authorization"
+    in: "header"
+definitions:
+  User:
+    type: "object"
+    required:
+      - username
+      - email
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+        readOnly: true
+        example: 2
+      username:
+        type: "string"
+        example: "synaisthisis"
+      email:
+        type: "string"
+        example: "synaisthisi@iit.demokritos.gr"
+      registred_on:
+        type: "string"
+        readOnly: true
+        example: "Monday, 09 December 2019 11:04AM"
+      confirmed: 
+        type: "boolean"
+        description: "Not currently used"
+        readOnly: true
+        example: false
+      confirmed_on:
+        type: "string"
+        description: "Not currently used"
+        readOnly: true
+        example: "Not yet Confirmed"
+      admin: 
+        type: "boolean"
+        default: false
+        readOnly: true
+        example: false
+  PostUser:
+    allOf:
+      - $ref: "#/definitions/User"
+      - type: object
+        required:
+        - password
+        properties:
+          password:
+            type: "string" 
+  Topic:
+      type: "object"
+      required:
+        - name
+        - description
+        - topic_ontology
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+          readOnly: true
+          example: 2
+        name:
+          type: "string"
+          example: "home/room/temperature"
+        description:
+          type: "string"
+          example: "Temperature in the room"
+        topic_ontology:
+          type: "string"
+          example: "float"
+  UserTopics:
+    allOf:
+      - $ref: "#/definitions/Topic"
+      - type: "object"
+        properties:
+          can_sub:
+            type: "boolean"
+            example: true  
+          can_pub:
+            type: "boolean"
+            example: true
+  Service:
+      type: "object"
+      required:
+        - name
+        - description
+        - service_type
+        - service_ontology
+        - location
+        - input_topics
+        - output_topics
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+          readOnly: true
+          example: 1
+        name:
+          type: "string"
+          example: "Room Temperature"
+        description:
+          type: "string"
+          example: "A service to watch room temperature"
+        service_type:
+          type: "string"
+          enum:
+          - "Sensor"
+          - "Actuator"
+          - "Processor"
+          example: "Processor"
+        service_ontology:
+          type: "string"
+          example: "ProcessingUnitService"
+        location:
+          type: "string"
+          example: "Home"
+        owner:
+          type: "string"
+          example: "synaisthisi"
+        input_topics:
+          type: "array"
+          items:
+            $ref: "#/definitions/Topic"
+        output_topics:
+          type: "array"
+          items:
+            $ref: "#/definitions/Topic"
+  ServiceExtended:
+    description: "Service object enriched with service management information"
+    allOf:
+      - $ref: "#/definitions/Service"
+      - type: object
+        properties:
+          service_image_built:
+            type: "boolean"
+            example: true
+          service_is_running:
+            type: "boolean"
+            example: false
+  ServiceWithSubscribers:
+    description: "Service object which also holds a list of service subscribers"
+    allOf:
+      - $ref: "#/definitions/Service"
+      - type: object
+        properties:
+          subscribers:
+            type: "array"
+            items:
+              type: "string"
+            example: [synaisthisi, user1, user2]
+  UserServiceMap:
+   description: "Service User mapping object, holds user subscription to service information"
+   allOf:
+      - $ref: "#/definitions/ServiceExtended"
+      - type: object
+        properties:
+          subscriber:
+            type: "boolean"
+            example: True
+  ApiFailedResponse:
+    type: "object"
+    properties:
+      message:
+        type: "string"
+        description: "Failure explanatory string"
+
+# externalDocs:
+#   description: "Find out more about Swagger"
+#   url: "http://swagger.io"
