@@ -1,6 +1,6 @@
 # **Welcome!**
 
-###In order to use our platform, first you have to create and run a local ![SYNAISTHISI][1] instance on your machine, via **Docker**.
+### In order to use our platform, first you have to create and run a local ![SYNAISTHISI][1] instance on your machine, via **Docker**.
 
 
 Not to worry though! We have prepared a quick and easy guide on how to do it on your own:
@@ -16,8 +16,8 @@ You will have to create a *.env* file, including values of critical environment 
 
 Then, run the following commands:
 
-1.      cd synaisthisi-container/docker_compose
-2.      sudo docker_compose up
+1.      cd synaisthisi-iot/docker_compose
+2.      sudo docker-compose up
 
 
 
@@ -41,6 +41,8 @@ Interfaces and Ports:
 
 1880: NodeRED
 
+### Architecture overview
+![Architecture](https://github.com/xarakas/synaisthisi-iot/blob/a5968e9f8281209df442042ab1ccf870b0040028/Wiki-pages/Arch-Syn-ContFlat4.png)
 
 #### When the process is completed, visit [localhost][3] from a local browser and you should be able to see the **SYNAISTHISI** Home page!
 
@@ -92,12 +94,21 @@ However, be sure to include username and password in the headers.
 
 E.g.: 
 
-GET -> curl -H "username:\[your username\]" -H "password:\[your password\]" http://localhost:3000/resources/\[your topic\]
+GET -> curl -H "username:\[your username\]" -H "password:\[your password\]" http://localhost:3000/resources/\[your_topic\]
 
-PUT -> curl -X PUT -H "username:\[your username\]" -H "password:\[your password\]" -d '\[your message\]' http://localhost:3000/resources/\[your topic\]
+PUT -> curl -X PUT -H "username:\[your username\]" -H "password:\[your password\]" -d '\[your message\]' http://localhost:3000/resources/\[your_topic\]
 
+## For more info visit our Wiki pages: https://github.com/xarakas/synaisthisi-iot/wiki
+ 
+## Related publications
+[Journal paper:][11] Akasiadis, Charilaos, Vassilis Pitsilis, and Constantine D. Spyropoulos. 2019. "A Multi-Protocol IoT Platform Based on Open-Source Frameworks" Sensors, 19, no. 19: 4217. https://doi.org/10.3390/s19194217 
+ 
+[Conference paper:][12] Pierris, Georgios, Dimosthenis Kothris, Evaggelos Spyrou, and Costas Spyropoulos. 2015. "SYNAISTHISI: an enabling platform for the current internet of things ecosystem". In Proceedings of the 19th Panhellenic Conference on Informatics (PCI '15). Association for Computing Machinery, New York, NY, USA, 438–444. https://doi.org/10.1145/2801948.2802019
+ 
+## Disclaimer: 
+ This repository is offered for research purposes. Please do not use this version in applications that require strict privacy, or that broadcast sensitive data.
 
-[1]: https://bitbucket.org/xarakas/syntelesis/raw/8e432c309c180daa0fb5a049928808dadf245075/syndelesis/ClientAppSyndelesis/dist/assets/synaisthisi_anim.gif "SYNAISTHISI gif"
+[1]: https://github.com/xarakas/synaisthisi-iot/blob/a5968e9f8281209df442042ab1ccf870b0040028/Wiki-pages/synaisthisi_anim.gif "SYNAISTHISI gif"
 [2]: https://docs.docker.com/ "Docker documentation"
 [3]: http://localhost/ "localhost"
 [4]: https://mosquitto.org/ "mosquitto"
@@ -107,3 +118,5 @@ PUT -> curl -X PUT -H "username:\[your username\]" -H "password:\[your password\
 [8]: http://localhost:8080/webpage/welcome/index.html?context=/~&cseId=in-cse "OM2M-endpoint"
 [9]: https://wiki.eclipse.org/OM2M/one/MQTT_Binding "oneM2M/MQTT binding info"
 [10]: https://vimeo.com/375467068
+[11]: https://www.mdpi.com/1424-8220/19/19/4217 "Journal paper:"
+[12]: https://dl.acm.org/doi/abs/10.1145/2801948.2802019 "Conference paper:"
