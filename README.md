@@ -74,6 +74,7 @@ Also, check the following SYNAISTHISI user guide video:
 ...and that concludes the guide.
 
 #### *Perfect! You can now start building your services using ![SYNAISTHISI][1] platform.*
+Submitted services are aggregated for research purposes.
 
 ## *MQTT Support*
 You can use any client (e.g., [mosquitto][4], or [mqtt-cli][5], etc.).
